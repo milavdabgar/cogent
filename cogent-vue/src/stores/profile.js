@@ -71,7 +71,7 @@ export const useProfileStore = defineStore('profile', () => {
         last_name: profileData.last_name,
         email: profileData.email,
         phone_number: profileData.phone_number,
-        date_of_birth: profileData.date_of_birth
+        date_of_birth: profileData.date_of_birth ? new Date(profileData.date_of_birth).toISOString().split('T')[0] : null
       }
 
       // Only include role-specific details if they exist in the profile
@@ -81,11 +81,13 @@ export const useProfileStore = defineStore('profile', () => {
           current_semester: profileData.current_semester,
           department: profileData.department
         }
-      } else if (profile.value?.role === 'faculty' && (profileData.department || profileData.qualification || profileData.specialization)) {
+      } else if (profile.value?.role === 'faculty' && profileData.faculty_details) {
         updateData.faculty_details = {
-          department: profileData.department,
-          qualification: profileData.qualification,
-          specialization: profileData.specialization
+          department: profileData.faculty_details.department,
+          qualification: profileData.faculty_details.qualification,
+          specialization: profileData.faculty_details.specialization,
+          date_of_joining: profileData.faculty_details.date_of_joining ? 
+            new Date(profileData.faculty_details.date_of_joining).toISOString().split('T')[0] : null
         }
       }
 

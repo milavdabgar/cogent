@@ -132,7 +132,7 @@
                     <template v-else-if="['faculty', 'hod', 'lab_assistant'].includes(profileStore.profile?.role)">
                       <v-col cols="12" md="6">
                         <v-text-field
-                          v-model="profileForm.department"
+                          v-model="profileForm.faculty_details.department"
                           label="Department"
                           :readonly="!isEditing"
                           variant="outlined"
@@ -141,7 +141,7 @@
                       </v-col>
                       <v-col cols="12" md="6">
                         <v-text-field
-                          v-model="profileForm.qualification"
+                          v-model="profileForm.faculty_details.qualification"
                           label="Qualification"
                           :readonly="!isEditing"
                           variant="outlined"
@@ -150,11 +150,41 @@
                       </v-col>
                       <v-col cols="12" md="6" v-if="profileStore.profile?.role === 'faculty'">
                         <v-text-field
-                          v-model="profileForm.specialization"
+                          v-model="profileForm.faculty_details.specialization"
                           label="Specialization"
                           :readonly="!isEditing"
                           variant="outlined"
                           :class="{ 'editable': isEditing }"
+                        />
+                      </v-col>
+                      <v-col cols="12" md="6" v-if="profileStore.profile?.role === 'faculty'">
+                        <v-menu
+                          v-if="isEditing"
+                          v-model="dateJoiningMenu"
+                          :close-on-content-click="false"
+                        >
+                          <template v-slot:activator="{ props }">
+                            <v-text-field
+                              v-model="formattedDateOfJoining"
+                              label="Date of Joining"
+                              readonly
+                              v-bind="props"
+                              variant="outlined"
+                              :class="{ 'editable': isEditing }"
+                              prepend-icon="mdi-calendar"
+                            />
+                          </template>
+                          <v-date-picker
+                            v-model="profileForm.faculty_details.date_of_joining"
+                            @update:model-value="dateJoiningMenu = false"
+                          />
+                        </v-menu>
+                        <v-text-field
+                          v-else
+                          v-model="formattedDateOfJoining"
+                          label="Date of Joining"
+                          readonly
+                          variant="outlined"
                         />
                       </v-col>
                     </template>
@@ -255,6 +285,7 @@ const activeTab = ref('profile')
 const snackbar = ref({ show: false, text: '', color: 'success' })
 const isEditing = ref(false)
 const dateMenu = ref(false)
+const dateJoiningMenu = ref(false)
 
 const profileForm = ref({
   valid: true,
@@ -266,8 +297,12 @@ const profileForm = ref({
   enrollment_number: '',
   current_semester: null,
   department: '',
-  qualification: '',
-  specialization: ''
+  faculty_details: {
+    department: '',
+    qualification: '',
+    specialization: '',
+    date_of_joining: null
+  }
 })
 
 const passwordForm = ref({
@@ -288,56 +323,104 @@ const formattedDateOfBirth = computed(() => {
   })
 })
 
+const formattedDateOfJoining = computed(() => {
+  if (!profileForm.value.faculty_details?.date_of_joining) return ''
+  try {
+    const date = new Date(profileForm.value.faculty_details.date_of_joining)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  } catch (error) {
+    return ''
+  }
+})
+
 onMounted(async () => {
   try {
     await profileStore.fetchProfile()
     if (profileStore.profile) {
-      // Map basic fields
-      const basicFields = ['first_name', 'last_name', 'email', 'phone_number', 'date_of_birth']
-      basicFields.forEach(field => {
-        if (profileStore.profile[field]) {
-          profileForm.value[field] = profileStore.profile[field]
-        }
-      })
+      // Set basic fields
+      const { first_name, last_name, email, phone_number, date_of_birth } = profileStore.profile
+      profileForm.value.first_name = first_name
+      profileForm.value.last_name = last_name
+      profileForm.value.email = email
+      profileForm.value.phone_number = phone_number
+      profileForm.value.date_of_birth = date_of_birth
 
-      // Map role-specific details
+      // Set role-specific fields
       if (profileStore.profile.role === 'student' && profileStore.profile.student_details) {
         const { enrollment_number, current_semester, department } = profileStore.profile.student_details
         profileForm.value.enrollment_number = enrollment_number
         profileForm.value.current_semester = current_semester
         profileForm.value.department = department
       } else if (profileStore.profile.role === 'faculty' && profileStore.profile.faculty_details) {
-        const { department, qualification, specialization } = profileStore.profile.faculty_details
-        profileForm.value.department = department
-        profileForm.value.qualification = qualification
-        profileForm.value.specialization = specialization
+        const { department, qualification, specialization, date_of_joining } = profileStore.profile.faculty_details
+        profileForm.value.faculty_details = {
+          department: department || '',
+          qualification: qualification || '',
+          specialization: specialization || '',
+          date_of_joining: date_of_joining || null
+        }
       }
     }
   } catch (error) {
+    console.error('Error fetching profile:', error)
     showError('Failed to load profile')
   }
 })
 
 const toggleEditMode = () => {
   if (isEditing.value) {
-    // Reset form to original values
+    // Reset form when canceling edit
     if (profileStore.profile) {
-      Object.keys(profileForm.value).forEach(key => {
-        if (key !== 'valid' && profileStore.profile[key]) {
-          profileForm.value[key] = profileStore.profile[key]
+      // Reset basic fields
+      const { first_name, last_name, email, phone_number, date_of_birth } = profileStore.profile
+      profileForm.value.first_name = first_name
+      profileForm.value.last_name = last_name
+      profileForm.value.email = email
+      profileForm.value.phone_number = phone_number
+      profileForm.value.date_of_birth = date_of_birth
+
+      // Reset role-specific fields
+      if (profileStore.profile.role === 'faculty' && profileStore.profile.faculty_details) {
+        const { department, qualification, specialization, date_of_joining } = profileStore.profile.faculty_details
+        profileForm.value.faculty_details = {
+          department: department || '',
+          qualification: qualification || '',
+          specialization: specialization || '',
+          date_of_joining: date_of_joining || null
         }
-      })
+      }
     }
   }
   isEditing.value = !isEditing.value
 }
 
-async function handleProfileUpdate() {
+const handleProfileUpdate = async () => {
   try {
-    await profileStore.updateProfile(profileForm.value)
+    const updateData = {
+      first_name: profileForm.value.first_name,
+      last_name: profileForm.value.last_name,
+      phone_number: profileForm.value.phone_number,
+      date_of_birth: profileForm.value.date_of_birth
+    }
+
+    if (profileStore.profile?.role === 'faculty') {
+      updateData.faculty_details = {
+        department: profileForm.value.faculty_details.department,
+        qualification: profileForm.value.faculty_details.qualification,
+        specialization: profileForm.value.faculty_details.specialization,
+        date_of_joining: profileForm.value.faculty_details.date_of_joining
+      }
+    }
+
+    await profileStore.updateProfile(updateData)
     showSuccess('Profile updated successfully')
     isEditing.value = false
   } catch (error) {
+    console.error('Error updating profile:', error)
     showError('Failed to update profile')
   }
 }
@@ -357,6 +440,7 @@ async function handlePasswordChange() {
       confirm_password: ''
     }
   } catch (error) {
+    console.error('Error changing password:', error)
     showError('Failed to change password')
   }
 }
