@@ -33,6 +33,8 @@
               <v-select
                 v-model="role"
                 :items="roles"
+                item-title="text"
+                item-value="value"
                 label="Role"
                 prepend-icon="mdi-account"
                 :rules="roleRules"
@@ -90,10 +92,11 @@ const roleRules = [
 ]
 
 const roles = [
-  'student',
-  'faculty',
-  'hod',
-  'lab_assistant'
+  { text: 'Principal', value: 'principal' },
+  { text: 'HOD', value: 'hod' },
+  { text: 'Faculty', value: 'faculty' },
+  { text: 'Lab Assistant', value: 'lab_assistant' },
+  { text: 'Student', value: 'student' }
 ]
 
 const handleSubmit = async () => {

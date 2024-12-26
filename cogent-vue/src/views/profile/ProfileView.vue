@@ -98,38 +98,71 @@
                     <template v-if="profileStore.profile?.role === 'student'">
                       <v-col cols="12" md="6">
                         <v-text-field
-                          v-model="profileForm.enrollment_number"
+                          v-model="profileForm.student_details.enrollment_number"
                           label="Enrollment Number"
                           :readonly="!isEditing"
                           variant="outlined"
                           :class="{ 'editable': isEditing }"
+                          :rules="[v => !!v || 'Enrollment number is required']"
                         />
                       </v-col>
                       <v-col cols="12" md="6">
                         <v-text-field
-                          v-model="profileForm.current_semester"
+                          v-model="profileForm.student_details.department"
+                          label="Department"
+                          :readonly="!isEditing"
+                          variant="outlined"
+                          :class="{ 'editable': isEditing }"
+                          :rules="[v => !!v || 'Department is required']"
+                        />
+                      </v-col>
+                      <v-col cols="12" md="6">
+                        <v-text-field
+                          v-model="profileForm.student_details.current_semester"
                           label="Current Semester"
                           type="number"
                           :readonly="!isEditing"
                           variant="outlined"
                           :class="{ 'editable': isEditing }"
                           :rules="[
+                            v => !!v || 'Current semester is required',
                             v => (!v || (v >= 1 && v <= 8)) || 'Semester must be between 1 and 8'
                           ]"
                         />
                       </v-col>
                       <v-col cols="12" md="6">
+                        <v-menu
+                          v-if="isEditing"
+                          v-model="dateAdmissionMenu"
+                          :close-on-content-click="false"
+                        >
+                          <template v-slot:activator="{ props }">
+                            <v-text-field
+                              v-model="formattedDateOfAdmission"
+                              label="Date of Admission"
+                              readonly
+                              v-bind="props"
+                              variant="outlined"
+                              :class="{ 'editable': isEditing }"
+                              prepend-icon="mdi-calendar"
+                            />
+                          </template>
+                          <v-date-picker
+                            v-model="profileForm.student_details.date_of_admission"
+                            @update:model-value="dateAdmissionMenu = false"
+                          />
+                        </v-menu>
                         <v-text-field
-                          v-model="profileForm.department"
-                          label="Department"
-                          :readonly="!isEditing"
+                          v-else
+                          v-model="formattedDateOfAdmission"
+                          label="Date of Admission"
+                          readonly
                           variant="outlined"
-                          :class="{ 'editable': isEditing }"
                         />
                       </v-col>
                     </template>
 
-                    <template v-else-if="['faculty', 'hod', 'lab_assistant'].includes(profileStore.profile?.role)">
+                    <template v-if="profileStore.profile?.role === 'faculty'">
                       <v-col cols="12" md="6">
                         <v-text-field
                           v-model="profileForm.faculty_details.department"
@@ -137,6 +170,7 @@
                           :readonly="!isEditing"
                           variant="outlined"
                           :class="{ 'editable': isEditing }"
+                          :rules="[v => !!v || 'Department is required']"
                         />
                       </v-col>
                       <v-col cols="12" md="6">
@@ -146,18 +180,20 @@
                           :readonly="!isEditing"
                           variant="outlined"
                           :class="{ 'editable': isEditing }"
+                          :rules="[v => !!v || 'Qualification is required']"
                         />
                       </v-col>
-                      <v-col cols="12" md="6" v-if="profileStore.profile?.role === 'faculty'">
+                      <v-col cols="12" md="6">
                         <v-text-field
                           v-model="profileForm.faculty_details.specialization"
                           label="Specialization"
                           :readonly="!isEditing"
                           variant="outlined"
                           :class="{ 'editable': isEditing }"
+                          :rules="[v => !!v || 'Specialization is required']"
                         />
                       </v-col>
-                      <v-col cols="12" md="6" v-if="profileStore.profile?.role === 'faculty'">
+                      <v-col cols="12" md="6">
                         <v-menu
                           v-if="isEditing"
                           v-model="dateJoiningMenu"
@@ -176,6 +212,177 @@
                           </template>
                           <v-date-picker
                             v-model="profileForm.faculty_details.date_of_joining"
+                            @update:model-value="dateJoiningMenu = false"
+                          />
+                        </v-menu>
+                        <v-text-field
+                          v-else
+                          v-model="formattedDateOfJoining"
+                          label="Date of Joining"
+                          readonly
+                          variant="outlined"
+                        />
+                      </v-col>
+                    </template>
+
+                    <template v-if="profileStore.profile?.role === 'hod'">
+                      <v-col cols="12" md="6">
+                        <v-text-field
+                          v-model="profileForm.hod_details.department"
+                          label="Department"
+                          :readonly="!isEditing"
+                          variant="outlined"
+                          :class="{ 'editable': isEditing }"
+                          :rules="[v => !!v || 'Department is required']"
+                        />
+                      </v-col>
+                      <v-col cols="12" md="6">
+                        <v-text-field
+                          v-model="profileForm.hod_details.qualification"
+                          label="Qualification"
+                          :readonly="!isEditing"
+                          variant="outlined"
+                          :class="{ 'editable': isEditing }"
+                          :rules="[v => !!v || 'Qualification is required']"
+                        />
+                      </v-col>
+                      <v-col cols="12" md="6">
+                        <v-text-field
+                          v-model="profileForm.hod_details.experience_years"
+                          label="Years of Experience"
+                          type="number"
+                          :readonly="!isEditing"
+                          variant="outlined"
+                          :class="{ 'editable': isEditing }"
+                          :rules="[v => !!v || 'Years of experience is required']"
+                        />
+                      </v-col>
+                      <v-col cols="12" md="6">
+                        <v-menu
+                          v-if="isEditing"
+                          v-model="dateJoiningMenu"
+                          :close-on-content-click="false"
+                        >
+                          <template v-slot:activator="{ props }">
+                            <v-text-field
+                              v-model="formattedDateOfJoining"
+                              label="Date of Joining"
+                              readonly
+                              v-bind="props"
+                              variant="outlined"
+                              :class="{ 'editable': isEditing }"
+                              prepend-icon="mdi-calendar"
+                            />
+                          </template>
+                          <v-date-picker
+                            v-model="profileForm.hod_details.date_of_joining"
+                            @update:model-value="dateJoiningMenu = false"
+                          />
+                        </v-menu>
+                        <v-text-field
+                          v-else
+                          v-model="formattedDateOfJoining"
+                          label="Date of Joining"
+                          readonly
+                          variant="outlined"
+                        />
+                      </v-col>
+                    </template>
+
+                    <template v-if="profileStore.profile?.role === 'principal'">
+                      <v-col cols="12" md="6">
+                        <v-text-field
+                          v-model="profileForm.principal_details.qualification"
+                          label="Qualification"
+                          :readonly="!isEditing"
+                          variant="outlined"
+                          :class="{ 'editable': isEditing }"
+                          :rules="[v => !!v || 'Qualification is required']"
+                        />
+                      </v-col>
+                      <v-col cols="12" md="6">
+                        <v-text-field
+                          v-model="profileForm.principal_details.experience_years"
+                          label="Years of Experience"
+                          type="number"
+                          :readonly="!isEditing"
+                          variant="outlined"
+                          :class="{ 'editable': isEditing }"
+                          :rules="[v => !!v || 'Years of experience is required']"
+                        />
+                      </v-col>
+                      <v-col cols="12" md="6">
+                        <v-menu
+                          v-if="isEditing"
+                          v-model="dateJoiningMenu"
+                          :close-on-content-click="false"
+                        >
+                          <template v-slot:activator="{ props }">
+                            <v-text-field
+                              v-model="formattedDateOfJoining"
+                              label="Date of Joining"
+                              readonly
+                              v-bind="props"
+                              variant="outlined"
+                              :class="{ 'editable': isEditing }"
+                              prepend-icon="mdi-calendar"
+                            />
+                          </template>
+                          <v-date-picker
+                            v-model="profileForm.principal_details.date_of_joining"
+                            @update:model-value="dateJoiningMenu = false"
+                          />
+                        </v-menu>
+                        <v-text-field
+                          v-else
+                          v-model="formattedDateOfJoining"
+                          label="Date of Joining"
+                          readonly
+                          variant="outlined"
+                        />
+                      </v-col>
+                    </template>
+
+                    <template v-if="profileStore.profile?.role === 'lab_assistant'">
+                      <v-col cols="12" md="6">
+                        <v-text-field
+                          v-model="profileForm.lab_assistant_details.department"
+                          label="Department"
+                          :readonly="!isEditing"
+                          variant="outlined"
+                          :class="{ 'editable': isEditing }"
+                          :rules="[v => !!v || 'Department is required']"
+                        />
+                      </v-col>
+                      <v-col cols="12" md="6">
+                        <v-text-field
+                          v-model="profileForm.lab_assistant_details.lab_type"
+                          label="Lab Type"
+                          :readonly="!isEditing"
+                          variant="outlined"
+                          :class="{ 'editable': isEditing }"
+                          :rules="[v => !!v || 'Lab type is required']"
+                        />
+                      </v-col>
+                      <v-col cols="12" md="6">
+                        <v-menu
+                          v-if="isEditing"
+                          v-model="dateJoiningMenu"
+                          :close-on-content-click="false"
+                        >
+                          <template v-slot:activator="{ props }">
+                            <v-text-field
+                              v-model="formattedDateOfJoining"
+                              label="Date of Joining"
+                              readonly
+                              v-bind="props"
+                              variant="outlined"
+                              :class="{ 'editable': isEditing }"
+                              prepend-icon="mdi-calendar"
+                            />
+                          </template>
+                          <v-date-picker
+                            v-model="profileForm.lab_assistant_details.date_of_joining"
                             @update:model-value="dateJoiningMenu = false"
                           />
                         </v-menu>
@@ -286,6 +493,7 @@ const snackbar = ref({ show: false, text: '', color: 'success' })
 const isEditing = ref(false)
 const dateMenu = ref(false)
 const dateJoiningMenu = ref(false)
+const dateAdmissionMenu = ref(false)
 
 const profileForm = ref({
   valid: true,
@@ -293,15 +501,34 @@ const profileForm = ref({
   last_name: '',
   email: '',
   phone_number: '',
-  date_of_birth: null,
-  enrollment_number: '',
-  current_semester: null,
-  department: '',
+  date_of_birth: '',
+  student_details: {
+    enrollment_number: '',
+    department: '',
+    date_of_admission: '',
+    current_semester: null
+  },
   faculty_details: {
     department: '',
+    date_of_joining: '',
     qualification: '',
-    specialization: '',
-    date_of_joining: null
+    specialization: ''
+  },
+  hod_details: {
+    department: '',
+    date_of_joining: '',
+    qualification: '',
+    experience_years: null
+  },
+  principal_details: {
+    date_of_joining: '',
+    qualification: '',
+    experience_years: null
+  },
+  lab_assistant_details: {
+    department: '',
+    date_of_joining: '',
+    lab_type: ''
   }
 })
 
@@ -313,29 +540,35 @@ const passwordForm = ref({
 })
 
 // Format date for display
-const formattedDateOfBirth = computed(() => {
-  if (!profileForm.value.date_of_birth) return ''
-  const date = new Date(profileForm.value.date_of_birth)
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-})
-
+const formattedDateOfBirth = computed(() => formatDate(profileForm.value.date_of_birth))
 const formattedDateOfJoining = computed(() => {
-  if (!profileForm.value.faculty_details?.date_of_joining) return ''
-  try {
-    const date = new Date(profileForm.value.faculty_details.date_of_joining)
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  } catch (error) {
-    return ''
+  const role = profileStore.profile?.role
+  if (!role) return ''
+  
+  let date = ''
+  switch (role) {
+    case 'faculty':
+      date = profileForm.value.faculty_details.date_of_joining
+      break
+    case 'hod':
+      date = profileForm.value.hod_details.date_of_joining
+      break
+    case 'principal':
+      date = profileForm.value.principal_details.date_of_joining
+      break
+    case 'lab_assistant':
+      date = profileForm.value.lab_assistant_details.date_of_joining
+      break
   }
+  return formatDate(date)
 })
+const formattedDateOfAdmission = computed(() => formatDate(profileForm.value.student_details.date_of_admission))
+
+// Date formatter
+const formatDate = (date) => {
+  if (!date) return ''
+  return new Date(date).toLocaleDateString()
+}
 
 onMounted(async () => {
   try {
@@ -351,18 +584,33 @@ onMounted(async () => {
 
       // Set role-specific fields
       if (profileStore.profile.role === 'student' && profileStore.profile.student_details) {
-        const { enrollment_number, current_semester, department } = profileStore.profile.student_details
-        profileForm.value.enrollment_number = enrollment_number
-        profileForm.value.current_semester = current_semester
-        profileForm.value.department = department
+        const { enrollment_number, department, date_of_admission, current_semester } = profileStore.profile.student_details
+        profileForm.value.student_details.enrollment_number = enrollment_number
+        profileForm.value.student_details.department = department
+        profileForm.value.student_details.date_of_admission = date_of_admission
+        profileForm.value.student_details.current_semester = current_semester
       } else if (profileStore.profile.role === 'faculty' && profileStore.profile.faculty_details) {
-        const { department, qualification, specialization, date_of_joining } = profileStore.profile.faculty_details
-        profileForm.value.faculty_details = {
-          department: department || '',
-          qualification: qualification || '',
-          specialization: specialization || '',
-          date_of_joining: date_of_joining || null
-        }
+        const { department, date_of_joining, qualification, specialization } = profileStore.profile.faculty_details
+        profileForm.value.faculty_details.department = department
+        profileForm.value.faculty_details.date_of_joining = date_of_joining
+        profileForm.value.faculty_details.qualification = qualification
+        profileForm.value.faculty_details.specialization = specialization
+      } else if (profileStore.profile.role === 'hod' && profileStore.profile.hod_details) {
+        const { department, date_of_joining, qualification, experience_years } = profileStore.profile.hod_details
+        profileForm.value.hod_details.department = department
+        profileForm.value.hod_details.date_of_joining = date_of_joining
+        profileForm.value.hod_details.qualification = qualification
+        profileForm.value.hod_details.experience_years = experience_years
+      } else if (profileStore.profile.role === 'principal' && profileStore.profile.principal_details) {
+        const { date_of_joining, qualification, experience_years } = profileStore.profile.principal_details
+        profileForm.value.principal_details.date_of_joining = date_of_joining
+        profileForm.value.principal_details.qualification = qualification
+        profileForm.value.principal_details.experience_years = experience_years
+      } else if (profileStore.profile.role === 'lab_assistant' && profileStore.profile.lab_assistant_details) {
+        const { department, date_of_joining, lab_type } = profileStore.profile.lab_assistant_details
+        profileForm.value.lab_assistant_details.department = department
+        profileForm.value.lab_assistant_details.date_of_joining = date_of_joining
+        profileForm.value.lab_assistant_details.lab_type = lab_type
       }
     }
   } catch (error) {
@@ -384,14 +632,34 @@ const toggleEditMode = () => {
       profileForm.value.date_of_birth = date_of_birth
 
       // Reset role-specific fields
-      if (profileStore.profile.role === 'faculty' && profileStore.profile.faculty_details) {
-        const { department, qualification, specialization, date_of_joining } = profileStore.profile.faculty_details
-        profileForm.value.faculty_details = {
-          department: department || '',
-          qualification: qualification || '',
-          specialization: specialization || '',
-          date_of_joining: date_of_joining || null
-        }
+      if (profileStore.profile.role === 'student' && profileStore.profile.student_details) {
+        const { enrollment_number, department, date_of_admission, current_semester } = profileStore.profile.student_details
+        profileForm.value.student_details.enrollment_number = enrollment_number
+        profileForm.value.student_details.department = department
+        profileForm.value.student_details.date_of_admission = date_of_admission
+        profileForm.value.student_details.current_semester = current_semester
+      } else if (profileStore.profile.role === 'faculty' && profileStore.profile.faculty_details) {
+        const { department, date_of_joining, qualification, specialization } = profileStore.profile.faculty_details
+        profileForm.value.faculty_details.department = department
+        profileForm.value.faculty_details.date_of_joining = date_of_joining
+        profileForm.value.faculty_details.qualification = qualification
+        profileForm.value.faculty_details.specialization = specialization
+      } else if (profileStore.profile.role === 'hod' && profileStore.profile.hod_details) {
+        const { department, date_of_joining, qualification, experience_years } = profileStore.profile.hod_details
+        profileForm.value.hod_details.department = department
+        profileForm.value.hod_details.date_of_joining = date_of_joining
+        profileForm.value.hod_details.qualification = qualification
+        profileForm.value.hod_details.experience_years = experience_years
+      } else if (profileStore.profile.role === 'principal' && profileStore.profile.principal_details) {
+        const { date_of_joining, qualification, experience_years } = profileStore.profile.principal_details
+        profileForm.value.principal_details.date_of_joining = date_of_joining
+        profileForm.value.principal_details.qualification = qualification
+        profileForm.value.principal_details.experience_years = experience_years
+      } else if (profileStore.profile.role === 'lab_assistant' && profileStore.profile.lab_assistant_details) {
+        const { department, date_of_joining, lab_type } = profileStore.profile.lab_assistant_details
+        profileForm.value.lab_assistant_details.department = department
+        profileForm.value.lab_assistant_details.date_of_joining = date_of_joining
+        profileForm.value.lab_assistant_details.lab_type = lab_type
       }
     }
   }
@@ -407,12 +675,38 @@ const handleProfileUpdate = async () => {
       date_of_birth: profileForm.value.date_of_birth
     }
 
-    if (profileStore.profile?.role === 'faculty') {
+    if (profileStore.profile?.role === 'student') {
+      updateData.student_details = {
+        enrollment_number: profileForm.value.student_details.enrollment_number,
+        department: profileForm.value.student_details.department,
+        date_of_admission: profileForm.value.student_details.date_of_admission,
+        current_semester: profileForm.value.student_details.current_semester
+      }
+    } else if (profileStore.profile?.role === 'faculty') {
       updateData.faculty_details = {
         department: profileForm.value.faculty_details.department,
+        date_of_joining: profileForm.value.faculty_details.date_of_joining,
         qualification: profileForm.value.faculty_details.qualification,
-        specialization: profileForm.value.faculty_details.specialization,
-        date_of_joining: profileForm.value.faculty_details.date_of_joining
+        specialization: profileForm.value.faculty_details.specialization
+      }
+    } else if (profileStore.profile?.role === 'hod') {
+      updateData.hod_details = {
+        department: profileForm.value.hod_details.department,
+        date_of_joining: profileForm.value.hod_details.date_of_joining,
+        qualification: profileForm.value.hod_details.qualification,
+        experience_years: profileForm.value.hod_details.experience_years
+      }
+    } else if (profileStore.profile?.role === 'principal') {
+      updateData.principal_details = {
+        date_of_joining: profileForm.value.principal_details.date_of_joining,
+        qualification: profileForm.value.principal_details.qualification,
+        experience_years: profileForm.value.principal_details.experience_years
+      }
+    } else if (profileStore.profile?.role === 'lab_assistant') {
+      updateData.lab_assistant_details = {
+        department: profileForm.value.lab_assistant_details.department,
+        date_of_joining: profileForm.value.lab_assistant_details.date_of_joining,
+        lab_type: profileForm.value.lab_assistant_details.lab_type
       }
     }
 
