@@ -1,0 +1,44 @@
+/* Common background styles */
+.page-container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Card styles */
+.auth-card {
+  width: 100%;
+  margin: auto;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Form styles */
+.form-container {
+  width: 100%;
+}
+
+/* Text styles */
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Link styles */
+.auth-link {
+  color: var(--v-primary-base);
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+/* Spacing utilities */
+.auth-section {
+  margin-bottom: 1.5rem;
+}

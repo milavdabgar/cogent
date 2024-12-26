@@ -1,278 +1,263 @@
 <template>
-  <v-container fluid class="fill-height login-container">
-    <v-row align="center" justify="center" class="fill-height">
-      <v-col cols="12" sm="8" md="6" lg="4">
-        <v-card class="elevation-12">
-          <v-card-title class="text-h5 text-center py-4">
-            Sign Up
-          </v-card-title>
-          <v-card-text>
-            <v-form ref="form" v-model="valid" @submit.prevent="handleSubmit">
-              <v-row>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="firstName"
-                    label="First Name"
-                    prepend-icon="mdi-account"
-                    :rules="nameRules"
-                    required
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model="lastName"
-                    label="Last Name"
-                    prepend-icon="mdi-account"
-                    :rules="nameRules"
-                    required
-                  ></v-text-field>
-                </v-col>
-              </v-row>
+  <div class="page-container">
+    <div class="form-wrapper">
+      <v-card class="signup-card">
+        <v-card-title class="text-center text-h5 pt-4">
+          Sign Up
+        </v-card-title>
 
-              <v-text-field
-                v-model="email"
-                label="Email"
-                prepend-icon="mdi-email"
-                :rules="emailRules"
+        <v-card-text>
+          <v-form ref="form" v-model="valid" @submit.prevent="handleSubmit">
+            <v-row>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="firstName"
+                  label="First Name"
+                  :rules="nameRules"
+                  prepend-icon="mdi-account"
+                  required
+                ></v-text-field>
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="lastName"
+                  label="Last Name"
+                  :rules="nameRules"
+                  prepend-icon="mdi-account"
+                  required
+                ></v-text-field>
+              </v-col>
+            </v-row>
+
+            <v-text-field
+              v-model="email"
+              label="Email"
+              type="email"
+              :rules="emailRules"
+              prepend-icon="mdi-email"
+              required
+            ></v-text-field>
+
+            <v-text-field
+              v-model="phoneNumber"
+              label="Phone Number"
+              :rules="phoneNumberRules"
+              prepend-icon="mdi-phone"
+              required
+            ></v-text-field>
+
+            <v-text-field
+              v-model="password"
+              label="Password"
+              :type="showPassword ? 'text' : 'password'"
+              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append="showPassword = !showPassword"
+              :rules="passwordRules"
+              prepend-icon="mdi-lock"
+              required
+            ></v-text-field>
+
+            <v-text-field
+              v-model="confirmPassword"
+              label="Confirm Password"
+              :type="showConfirmPassword ? 'text' : 'password'"
+              :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append="showConfirmPassword = !showConfirmPassword"
+              :rules="[...passwordRules, passwordMatch]"
+              prepend-icon="mdi-lock"
+              required
+            ></v-text-field>
+
+            <v-text-field
+              v-model="dateOfBirth"
+              type="date"
+              label="Date of Birth"
+              prepend-icon="mdi-cake-variant"
+              :rules="dateOfBirthRules"
+              required
+            ></v-text-field>
+
+            <v-select
+              v-model="role"
+              :items="roles"
+              item-title="text"
+              item-value="value"
+              label="Role"
+              prepend-icon="mdi-account-group"
+              :rules="roleRules"
+              required
+            ></v-select>
+
+            <!-- Department field for roles that need it -->
+            <div v-if="['student', 'faculty', 'hod', 'lab_assistant'].includes(role)">
+              <v-select
+                v-model="department"
+                :items="departments"
+                label="Department"
+                prepend-icon="mdi-domain"
+                :rules="departmentRules"
                 required
-              ></v-text-field>
+              ></v-select>
+            </div>
 
+            <!-- Student specific fields -->
+            <div v-if="role === 'student'" class="auth-section">
               <v-text-field
-                v-model="phoneNumber"
-                label="Phone Number"
-                prepend-icon="mdi-phone"
-                :rules="phoneNumberRules"
-                required
-              ></v-text-field>
-
-              <v-text-field
-                v-model="password"
-                label="Password"
-                prepend-icon="mdi-lock"
-                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                :type="showPassword ? 'text' : 'password'"
-                :rules="passwordRules"
-                @click:append="showPassword = !showPassword"
-                required
-              ></v-text-field>
-
-              <v-text-field
-                v-model="confirmPassword"
-                label="Confirm Password"
-                prepend-icon="mdi-lock"
-                :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                :type="showConfirmPassword ? 'text' : 'password'"
-                :rules="[...passwordRules, passwordMatch]"
-                @click:append="showConfirmPassword = !showConfirmPassword"
-                required
-              ></v-text-field>
-
-              <v-text-field
-                v-model="dateOfBirth"
-                type="date"
-                label="Date of Birth"
-                prepend-icon="mdi-cake-variant"
-                :rules="dateOfBirthRules"
+                v-model="enrollmentNumber"
+                label="Enrollment Number"
+                prepend-icon="mdi-identifier"
+                :rules="enrollmentRules"
                 required
               ></v-text-field>
 
               <v-select
-                v-model="role"
-                :items="roles"
-                item-title="text"
-                item-value="value"
-                label="Role"
-                prepend-icon="mdi-account-group"
-                :rules="roleRules"
+                v-model="currentSemester"
+                :items="semesters"
+                label="Current Semester"
+                prepend-icon="mdi-calendar"
+                :rules="semesterRules"
                 required
               ></v-select>
 
-              <!-- Department field for roles that need it -->
-              <div v-if="['student', 'faculty', 'hod', 'lab_assistant'].includes(role)">
-                <v-select
-                  v-model="department"
-                  :items="departments"
-                  label="Department"
-                  prepend-icon="mdi-domain"
-                  :rules="departmentRules"
-                  required
-                ></v-select>
-              </div>
+              <v-text-field
+                v-model="dateOfAdmission"
+                type="date"
+                label="Date of Admission"
+                prepend-icon="mdi-calendar"
+                :rules="dateRules"
+                required
+              ></v-text-field>
+            </div>
 
-              <!-- Student specific fields -->
-              <div v-if="role === 'student'">
-                <v-text-field
-                  v-model="enrollmentNumber"
-                  label="Enrollment Number"
-                  prepend-icon="mdi-identifier"
-                  :rules="enrollmentRules"
-                  required
-                ></v-text-field>
+            <!-- Faculty specific fields -->
+            <div v-if="role === 'faculty'" class="auth-section">
+              <v-text-field
+                v-model="qualification"
+                label="Qualification"
+                prepend-icon="mdi-school"
+                :rules="qualificationRules"
+                required
+              ></v-text-field>
 
-                <v-select
-                  v-model="currentSemester"
-                  :items="semesters"
-                  label="Current Semester"
-                  prepend-icon="mdi-calendar"
-                  :rules="semesterRules"
-                  required
-                ></v-select>
+              <v-text-field
+                v-model="specialization"
+                label="Specialization"
+                prepend-icon="mdi-book-open-variant"
+                :rules="specializationRules"
+                required
+              ></v-text-field>
 
-                <v-text-field
-                  v-model="dateOfAdmission"
-                  type="date"
-                  label="Date of Admission"
-                  prepend-icon="mdi-calendar"
-                  :rules="dateRules"
-                  required
-                ></v-text-field>
-              </div>
+              <v-text-field
+                v-model="dateOfJoining"
+                type="date"
+                label="Date of Joining"
+                prepend-icon="mdi-calendar"
+                :rules="dateRules"
+                required
+              ></v-text-field>
+            </div>
 
-              <!-- Faculty specific fields -->
-              <div v-if="role === 'faculty'">
-                <v-text-field
-                  v-model="qualification"
-                  label="Qualification"
-                  prepend-icon="mdi-school"
-                  :rules="qualificationRules"
-                  required
-                ></v-text-field>
+            <!-- HOD specific fields -->
+            <div v-if="role === 'hod'" class="auth-section">
+              <v-text-field
+                v-model="qualification"
+                label="Qualification"
+                prepend-icon="mdi-school"
+                :rules="qualificationRules"
+                required
+              ></v-text-field>
 
-                <v-text-field
-                  v-model="specialization"
-                  label="Specialization"
-                  prepend-icon="mdi-book-open-variant"
-                  :rules="specializationRules"
-                  required
-                ></v-text-field>
+              <v-text-field
+                v-model="experienceYears"
+                label="Years of Experience"
+                type="number"
+                prepend-icon="mdi-clock-outline"
+                :rules="experienceRules"
+                required
+              ></v-text-field>
 
-                <v-text-field
-                  v-model="dateOfJoining"
-                  type="date"
-                  label="Date of Joining"
-                  prepend-icon="mdi-calendar"
-                  :rules="dateRules"
-                  required
-                ></v-text-field>
-              </div>
+              <v-text-field
+                v-model="dateOfJoining"
+                type="date"
+                label="Date of Joining"
+                prepend-icon="mdi-calendar"
+                :rules="dateRules"
+                required
+              ></v-text-field>
+            </div>
 
-              <!-- HOD specific fields -->
-              <div v-if="role === 'hod'">
-                <v-text-field
-                  v-model="qualification"
-                  label="Qualification"
-                  prepend-icon="mdi-school"
-                  :rules="qualificationRules"
-                  required
-                ></v-text-field>
+            <!-- Principal specific fields -->
+            <div v-if="role === 'principal'" class="auth-section">
+              <v-text-field
+                v-model="qualification"
+                label="Qualification"
+                prepend-icon="mdi-school"
+                :rules="qualificationRules"
+                required
+              ></v-text-field>
 
-                <v-text-field
-                  v-model="experienceYears"
-                  label="Years of Experience"
-                  type="number"
-                  prepend-icon="mdi-clock-outline"
-                  :rules="experienceRules"
-                  required
-                ></v-text-field>
+              <v-text-field
+                v-model="experienceYears"
+                label="Years of Experience"
+                type="number"
+                prepend-icon="mdi-clock-outline"
+                :rules="experienceRules"
+                required
+              ></v-text-field>
 
-                <v-text-field
-                  v-model="dateOfJoining"
-                  type="date"
-                  label="Date of Joining"
-                  prepend-icon="mdi-calendar"
-                  :rules="dateRules"
-                  required
-                ></v-text-field>
-              </div>
+              <v-text-field
+                v-model="dateOfJoining"
+                type="date"
+                label="Date of Joining"
+                prepend-icon="mdi-calendar"
+                :rules="dateRules"
+                required
+              ></v-text-field>
+            </div>
 
-              <!-- Principal specific fields -->
-              <div v-if="role === 'principal'">
-                <v-text-field
-                  v-model="qualification"
-                  label="Qualification"
-                  prepend-icon="mdi-school"
-                  :rules="qualificationRules"
-                  required
-                ></v-text-field>
+            <!-- Lab Assistant specific fields -->
+            <div v-if="role === 'lab_assistant'" class="auth-section">
+              <v-text-field
+                v-model="labType"
+                label="Lab Type"
+                prepend-icon="mdi-flask"
+                :rules="labTypeRules"
+                required
+              ></v-text-field>
 
-                <v-text-field
-                  v-model="experienceYears"
-                  label="Years of Experience"
-                  type="number"
-                  prepend-icon="mdi-clock-outline"
-                  :rules="experienceRules"
-                  required
-                ></v-text-field>
+              <v-text-field
+                v-model="dateOfJoining"
+                type="date"
+                label="Date of Joining"
+                prepend-icon="mdi-calendar"
+                :rules="dateRules"
+                required
+              ></v-text-field>
+            </div>
+          </v-form>
+        </v-card-text>
 
-                <v-text-field
-                  v-model="dateOfJoining"
-                  type="date"
-                  label="Date of Joining"
-                  prepend-icon="mdi-calendar"
-                  :rules="dateRules"
-                  required
-                ></v-text-field>
-              </div>
+        <v-card-actions class="px-4 pb-4">
+          <v-btn
+            color="primary"
+            type="submit"
+            block
+            :loading="loading"
+            :disabled="!valid"
+            @click="handleSubmit"
+          >
+            Sign Up
+          </v-btn>
+        </v-card-actions>
 
-              <!-- Lab Assistant specific fields -->
-              <div v-if="role === 'lab_assistant'">
-                <v-text-field
-                  v-model="labType"
-                  label="Lab Type"
-                  prepend-icon="mdi-flask"
-                  :rules="labTypeRules"
-                  required
-                ></v-text-field>
-
-                <v-text-field
-                  v-model="dateOfJoining"
-                  type="date"
-                  label="Date of Joining"
-                  prepend-icon="mdi-calendar"
-                  :rules="dateRules"
-                  required
-                ></v-text-field>
-              </div>
-            </v-form>
-          </v-card-text>
-          <v-card-actions class="px-4 pb-4">
-            <v-btn
-              color="primary"
-              block
-              :loading="loading"
-              :disabled="!valid"
-              @click="handleSubmit"
-            >
-              Sign Up
-            </v-btn>
-          </v-card-actions>
-          <v-card-text class="text-center pt-0">
-            Already have an account?
-            <v-btn variant="text" to="/login" color="primary">
-              Login
-            </v-btn>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <v-snackbar
-      v-model="snackbar.show"
-      :color="snackbar.color"
-      timeout="3000"
-    >
-      {{ snackbar.text }}
-      <template v-slot:actions>
-        <v-btn
-          color="white"
-          variant="text"
-          @click="snackbar.show = false"
-        >
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
-  </v-container>
+        <v-card-text class="text-center pt-0">
+          <span class="text-grey">Already have an account? </span>
+          <router-link to="/login" class="auth-link">Login</router-link>
+        </v-card-text>
+      </v-card>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -444,29 +429,29 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.login-container {
-  background-color: #1976d2;
-  padding: 0;
-  margin: 0;
+.page-container {
+  background-color: #f5f5f5;
   min-height: 100vh;
-  height: 100vh;
-  width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 2rem;
 }
 
-.v-row {
-  margin: 0;
+.form-wrapper {
   width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.v-col {
-  padding: 12px;
-}
-
-.v-card {
+.signup-card {
   width: 100%;
-  margin: auto;
+  padding: 1rem;
+}
+
+@media (max-width: 600px) {
+  .page-container {
+    padding: 1rem;
+  }
 }
 </style>

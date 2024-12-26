@@ -1,32 +1,31 @@
 <template>
-  <v-container fluid class="fill-height login-container">
-    <v-row align="center" justify="center" class="fill-height">
-      <v-col cols="12" sm="8" md="4">
-        <v-card class="elevation-12">
-          <v-card-title class="text-h5 text-center py-4">
+  <v-container fluid class="page-container fill-height">
+    <v-row justify="center" align="center" class="fill-height">
+      <v-col cols="12" sm="8" md="6" lg="4">
+        <v-card class="auth-card elevation-2">
+          <v-card-title class="page-title">
             Login
           </v-card-title>
+
           <v-card-text>
-            <v-form ref="form" v-model="valid" @submit.prevent="handleSubmit">
+            <v-form ref="form" v-model="valid" @submit.prevent="handleSubmit" class="form-container">
               <v-text-field
                 v-model="email"
                 label="Email"
-                name="email"
-                prepend-icon="mdi-email"
-                type="text"
+                type="email"
                 :rules="emailRules"
+                prepend-icon="mdi-email"
                 required
               ></v-text-field>
 
               <v-text-field
                 v-model="password"
                 label="Password"
-                name="password"
-                prepend-icon="mdi-lock"
-                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 :type="showPassword ? 'text' : 'password'"
-                :rules="passwordRules"
+                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 @click:append="showPassword = !showPassword"
+                :rules="passwordRules"
+                prepend-icon="mdi-lock"
                 required
               ></v-text-field>
 
@@ -42,10 +41,11 @@
               ></v-select>
             </v-form>
           </v-card-text>
+
           <v-card-actions class="px-4 pb-4">
-            <v-spacer></v-spacer>
             <v-btn
               color="primary"
+              type="submit"
               block
               :loading="loading"
               :disabled="!valid"
@@ -54,6 +54,11 @@
               Login
             </v-btn>
           </v-card-actions>
+
+          <v-card-text class="text-center pt-0">
+            <span class="text-grey">Don't have an account? </span>
+            <router-link to="/signup" class="auth-link">Sign up</router-link>
+          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -119,8 +124,8 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.login-container {
-  background-color: #1976d2;
+.page-container {
+  background-color: #f5f5f5;
   padding: 0;
   margin: 0;
   min-height: 100vh;
@@ -140,9 +145,17 @@ const handleSubmit = async () => {
   padding: 12px;
 }
 
-.v-card {
+.auth-card {
   width: 100%;
   max-width: 400px;
   margin: auto;
+}
+
+.form-container {
+  padding: 20px;
+}
+
+.auth-link {
+  text-decoration: none;
 }
 </style>
