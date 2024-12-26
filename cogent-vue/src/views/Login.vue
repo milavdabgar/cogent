@@ -8,6 +8,17 @@
           </v-card-title>
 
           <v-card-text>
+            <v-alert
+              v-if="errorMessage"
+              type="error"
+              variant="tonal"
+              closable
+              class="mb-4"
+              @click:close="errorMessage = ''"
+            >
+              {{ errorMessage }}
+            </v-alert>
+
             <v-form ref="form" v-model="valid" @submit.prevent="handleSubmit" class="form-container">
               <v-text-field
                 v-model="email"
@@ -62,6 +73,23 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Success/Error Snackbar -->
+    <v-snackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      timeout="3000"
+    >
+      {{ snackbar.text }}
+      <template v-slot:actions>
+        <v-btn
+          variant="text"
+          @click="snackbar.show = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -77,6 +105,8 @@ const form = ref(null)
 const valid = ref(false)
 const loading = ref(false)
 const showPassword = ref(false)
+const errorMessage = ref('')
+const snackbar = ref({ show: false, text: '', color: 'success' })
 
 const email = ref('')
 const password = ref('')
@@ -108,15 +138,29 @@ const handleSubmit = async () => {
   if (!form.value.validate()) return
 
   loading.value = true
+  errorMessage.value = ''
+  
   try {
     await authStore.login({
       email: email.value,
       password: password.value,
       role: role.value
     })
+    snackbar.value = {
+      show: true,
+      text: 'Login successful!',
+      color: 'success'
+    }
     router.push(authStore.defaultRoute)
   } catch (error) {
     console.error('Login failed:', error)
+    if (error.response?.status === 401) {
+      errorMessage.value = 'Invalid email, password, or role. Please check your credentials.'
+    } else if (error.response?.data?.detail) {
+      errorMessage.value = error.response.data.detail
+    } else {
+      errorMessage.value = 'An error occurred during login. Please try again.'
+    }
   } finally {
     loading.value = false
   }
