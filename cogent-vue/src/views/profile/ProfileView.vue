@@ -413,7 +413,11 @@
 
               <!-- Security Tab -->
               <v-window-item value="security">
-                <v-form @submit.prevent="handlePasswordChange" v-model="passwordForm.valid">
+                <v-form 
+                  ref="passwordFormRef"
+                  @submit.prevent="handlePasswordChange" 
+                  v-model="passwordForm.valid"
+                >
                   <v-text-field
                     v-model="passwordForm.current_password"
                     label="Current Password"
@@ -484,9 +488,13 @@
 import { ref, onMounted, computed } from 'vue'
 import { useProfileStore } from '@/stores/profile'
 import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
 const profileStore = useProfileStore()
 const authStore = useAuthStore()
+const router = useRouter()
+
+const passwordFormRef = ref(null)
 
 const activeTab = ref('profile')
 const snackbar = ref({ show: false, text: '', color: 'success' })
@@ -723,19 +731,29 @@ async function handlePasswordChange() {
   try {
     await profileStore.changePassword({
       current_password: passwordForm.value.current_password,
-      new_password: passwordForm.value.new_password
+      new_password: passwordForm.value.new_password,
+      confirm_password: passwordForm.value.confirm_password
     })
     showSuccess('Password changed successfully')
-    // Reset password form
+    // Reset form and validation
     passwordForm.value = {
       valid: true,
       current_password: '',
       new_password: '',
       confirm_password: ''
     }
+    // Reset form validation
+    if (passwordFormRef.value) {
+      passwordFormRef.value.reset()
+    }
+    // Wait for 2 seconds to show the success message before redirecting
+    setTimeout(async () => {
+      await authStore.logout()
+      router.push('/login')
+    }, 2000)
   } catch (error) {
     console.error('Error changing password:', error)
-    showError('Failed to change password')
+    showError(error.response?.data?.detail || 'Failed to change password')
   }
 }
 
