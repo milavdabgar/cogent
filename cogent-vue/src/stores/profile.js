@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from './auth'
 
-const API_URL = 'http://localhost:8081'
+const API_URL = 'http://localhost:8000'
 
 // Create axios instance with base URL and interceptors
 const api = axios.create({
