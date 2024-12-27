@@ -45,7 +45,7 @@
                 <v-btn
                   block
                   color="primary"
-                  to="/dte-admin/colleges"
+                  to="/dashboard/dte-admin/colleges"
                   class="mb-2"
                 >
                   <v-icon start>mdi-office-building</v-icon>
@@ -56,7 +56,7 @@
                 <v-btn
                   block
                   color="secondary"
-                  to="/dte-admin/departments"
+                  to="/dashboard/dte-admin/departments"
                   class="mb-2"
                 >
                   <v-icon start>mdi-domain</v-icon>
@@ -115,12 +115,20 @@ const recentActivities = ref([
   }
 ])
 
-const fetchStats = async () => {
-  await dteAdminStore.fetchStats()
-  stats.value = dteAdminStore.stats || stats.value
-}
-
-onMounted(() => {
-  fetchStats()
+// Fetch initial data
+onMounted(async () => {
+  try {
+    await dteAdminStore.fetchColleges()
+    await dteAdminStore.fetchDepartments()
+    // Update stats from actual data
+    stats.value = {
+      totalColleges: dteAdminStore.colleges.length,
+      totalDepartments: dteAdminStore.departments.length,
+      activeStudents: 0, // These will be implemented later
+      activeFaculty: 0
+    }
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error)
+  }
 })
 </script>

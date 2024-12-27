@@ -193,9 +193,12 @@ const snackbar = ref({
 
 onMounted(async () => {
   try {
+    // First fetch colleges
+    await dteAdminStore.fetchColleges()
+    // Then fetch departments
     await dteAdminStore.fetchDepartments()
   } catch (error) {
-    showError('Failed to load departments')
+    showError(error.response?.data?.detail || 'Failed to load data')
   }
 })
 
