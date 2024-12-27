@@ -52,6 +52,7 @@ export const useAuthStore = defineStore('auth', {
       // Map roles to their corresponding dashboard paths
       const rolePaths = {
         lab_assistant: 'lab-assistant',
+        admin: 'admin'
         // Add other role mappings if needed
       }
       return state.role ? `/dashboard/${rolePaths[state.role] || state.role}` : '/'

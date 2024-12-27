@@ -4,6 +4,7 @@ from app.db.base_class import Base
 import enum
 
 class UserRole(str, enum.Enum):
+    ADMIN = "admin"
     PRINCIPAL = "principal"
     HOD = "hod"
     FACULTY = "faculty"
@@ -22,8 +23,10 @@ class User(Base):
     date_of_birth = Column(Date)
     role = Column(Enum(UserRole))
     is_active = Column(Boolean, default=True)
+    last_login = Column(Date, nullable=True)
     
     # Role specific details
+    admin_details = relationship("AdminDetails", back_populates="user", uselist=False)
     principal_details = relationship("PrincipalDetails", back_populates="user", uselist=False)
     hod_details = relationship("HODDetails", back_populates="user", uselist=False)
     faculty_details = relationship("FacultyDetails", back_populates="user", uselist=False)
@@ -87,3 +90,14 @@ class StudentDetails(Base):
     current_semester = Column(Integer)
     
     user = relationship("User", back_populates="student_details")
+
+class AdminDetails(Base):
+    __tablename__ = "admin_details"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    super_admin = Column(Boolean, default=False)  # For distinguishing super admins
+    date_of_joining = Column(Date)
+    access_level = Column(String)  # Can be used to define different admin access levels
+    
+    user = relationship("User", back_populates="admin_details")

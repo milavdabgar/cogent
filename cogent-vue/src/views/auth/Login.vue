@@ -127,6 +127,7 @@ const roleRules = [
 ]
 
 const roles = [
+  { text: 'Admin', value: 'admin' },
   { text: 'Principal', value: 'principal' },
   { text: 'HOD', value: 'hod' },
   { text: 'Faculty', value: 'faculty' },

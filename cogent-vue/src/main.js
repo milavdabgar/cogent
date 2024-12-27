@@ -14,7 +14,7 @@ import * as directives from 'vuetify/directives'
 import '@mdi/font/css/materialdesignicons.css'
 
 // Configure axios
-axios.defaults.baseURL = 'http://localhost:8001'
+axios.defaults.baseURL = 'http://localhost:8000'
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 
 // Add a request interceptor for JWT

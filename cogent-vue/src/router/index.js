@@ -57,6 +57,39 @@ const routes = [
     name: 'PrincipalDashboard',
     component: () => import('@/views/dashboards/PrincipalDashboard.vue'),
     meta: { requiresAuth: true, role: 'principal' }
+  },
+  {
+    path: '/dashboard/admin',
+    name: 'AdminDashboard',
+    component: () => import('@/views/dashboards/AdminDashboard.vue'),
+    meta: { requiresAuth: true, role: 'admin' }
+  },
+  // Admin management routes
+  {
+    path: '/admin',
+    meta: { requiresAuth: true, role: 'admin' },
+    children: [
+      {
+        path: 'users',
+        name: 'ManageUsers',
+        component: () => import('@/views/admin/UsersManagement.vue')
+      },
+      {
+        path: 'colleges',
+        name: 'ManageColleges',
+        component: () => import('@/views/admin/CollegesManagement.vue')
+      },
+      {
+        path: 'courses',
+        name: 'ManageCourses',
+        component: () => import('@/views/admin/CoursesManagement.vue')
+      },
+      {
+        path: 'settings',
+        name: 'SystemSettings',
+        component: () => import('@/views/admin/SystemSettings.vue')
+      }
+    ]
   }
 ]
 

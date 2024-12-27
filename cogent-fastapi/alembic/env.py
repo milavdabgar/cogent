@@ -1,10 +1,22 @@
+import os
+import sys
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
-from app.models.user import Base
+
+# Add the parent directory to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from app.db.base_class import Base
+from app.core.config import settings
+from app.models import user, college, course  # Import all models here
 
 config = context.config
+
+# Set sqlalchemy.url in alembic.ini from settings
+config.set_main_option("sqlalchemy.url", settings.SQLALCHEMY_DATABASE_URI)
+
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
@@ -31,7 +43,8 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata
         )
 
         with context.begin_transaction():
