@@ -48,7 +48,14 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     isAuthenticated: (state) => !!state.token,
     userRole: (state) => state.role,
-    defaultRoute: (state) => state.role ? `/dashboard/${state.role}` : '/',
+    defaultRoute: (state) => {
+      // Map roles to their corresponding dashboard paths
+      const rolePaths = {
+        lab_assistant: 'lab-assistant',
+        // Add other role mappings if needed
+      }
+      return state.role ? `/dashboard/${rolePaths[state.role] || state.role}` : '/'
+    },
     fullName: (state) => state.profile ? `${state.profile.first_name} ${state.profile.last_name}` : ''
   },
 
