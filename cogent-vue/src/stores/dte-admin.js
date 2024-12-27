@@ -12,15 +12,13 @@ const API_ENDPOINTS = {
   // DTE Admin endpoints
   stats: '/api/v1/dte-admin/stats',
   colleges: '/api/v1/dte-admin/colleges',
-  collegeById: (id) => `/api/v1/dte-admin/colleges/${id}`,
-  collegeDepartments: (id) => `/api/v1/dte-admin/colleges/${id}/departments`,
+  collegeById: (id) => `/api/v1/dte-admin/colleges/${id}`
 }
 
 export const useDTEAdminStore = defineStore('dte-admin', {
   state: () => ({
     stats: null,
     colleges: [],
-    departments: [],
     loading: false,
     error: null
   }),
@@ -56,91 +54,50 @@ export const useDTEAdminStore = defineStore('dte-admin', {
       }
     },
 
-    async fetchDepartments() {
+    async createCollege(collegeData) {
       this.loading = true
       try {
-        // First ensure colleges are loaded
-        if (this.colleges.length === 0) {
-          await this.fetchColleges()
-        }
-
-        // Fetch departments for each college
-        const departmentsPromises = this.colleges.map(college => 
-          axios.get(API_ENDPOINTS.collegeDepartments(college.id))
-        )
-
-        const responses = await Promise.all(departmentsPromises)
-        
-        // Combine all departments and add college names
-        this.departments = responses.flatMap(response => {
-          const departments = Array.isArray(response.data) ? response.data : []
-          return departments.map(dept => ({
-            ...dept,
-            college_name: this.colleges.find(c => c.id === dept.college_id)?.name || 'Unknown College'
-          }))
-        })
-
+        const response = await axios.post(API_ENDPOINTS.colleges, collegeData)
+        this.colleges.push(response.data)
         this.error = null
+        return response.data
       } catch (error) {
-        this.error = error.response?.data?.detail || 'Failed to fetch departments'
-        console.error('Error fetching departments:', error)
+        this.error = error.response?.data?.detail || 'Failed to create college'
+        console.error('Error creating college:', error)
         throw error
       } finally {
         this.loading = false
       }
     },
 
-    async createDepartment(departmentData) {
+    async updateCollege(collegeId, collegeData) {
       this.loading = true
       try {
-        const response = await axios.post(API_ENDPOINTS.collegeDepartments(departmentData.college_id), departmentData)
-        const newDepartment = {
-          ...response.data,
-          college_name: this.colleges.find(c => c.id === response.data.college_id)?.name || 'Unknown College'
-        }
-        this.departments.push(newDepartment)
-        this.error = null
-        return newDepartment
-      } catch (error) {
-        this.error = error.response?.data?.detail || 'Failed to create department'
-        console.error('Error creating department:', error)
-        throw error
-      } finally {
-        this.loading = false
-      }
-    },
-
-    async updateDepartment(departmentId, departmentData) {
-      this.loading = true
-      try {
-        const response = await axios.put(API_ENDPOINTS.collegeDepartments(departmentData.college_id), departmentData)
-        const index = this.departments.findIndex(d => d.id === departmentId)
+        const response = await axios.put(API_ENDPOINTS.collegeById(collegeId), collegeData)
+        const index = this.colleges.findIndex(c => c.id === collegeId)
         if (index !== -1) {
-          this.departments[index] = {
-            ...response.data,
-            college_name: this.colleges.find(c => c.id === response.data.college_id)?.name || 'Unknown College'
-          }
+          this.colleges[index] = response.data
         }
         this.error = null
         return response.data
       } catch (error) {
-        this.error = error.response?.data?.detail || 'Failed to update department'
-        console.error('Error updating department:', error)
+        this.error = error.response?.data?.detail || 'Failed to update college'
+        console.error('Error updating college:', error)
         throw error
       } finally {
         this.loading = false
       }
     },
 
-    async deleteDepartment(departmentId, collegeId) {
+    async deleteCollege(collegeId) {
       this.loading = true
       try {
-        await axios.delete(`${API_ENDPOINTS.collegeDepartments(collegeId)}/${departmentId}`)
-        this.departments = this.departments.filter(d => d.id !== departmentId)
+        await axios.delete(API_ENDPOINTS.collegeById(collegeId))
+        this.colleges = this.colleges.filter(c => c.id !== collegeId)
         this.error = null
       } catch (error) {
-        this.error = error.response?.data?.detail || 'Failed to delete department'
-        console.error('Error deleting department:', error)
+        this.error = error.response?.data?.detail || 'Failed to delete college'
+        console.error('Error deleting college:', error)
         throw error
       } finally {
         this.loading = false
