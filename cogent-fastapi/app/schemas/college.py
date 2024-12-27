@@ -44,15 +44,15 @@ class DepartmentUpdate(BaseModel):
     hod_id: Optional[int] = None
     is_active: Optional[bool] = None
 
-class Department(DepartmentBase):
+class DepartmentResponse(DepartmentBase):
     id: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
-class College(CollegeBase):
+class CollegeResponse(CollegeBase):
     id: int
-    departments: List[Department] = []
+    departments: List[DepartmentResponse] = []
     
     class Config:
-        orm_mode = True
+        from_attributes = True

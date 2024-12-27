@@ -21,30 +21,30 @@ class CourseUpdate(BaseModel):
     semester: Optional[int] = None
     is_active: Optional[bool] = None
 
-class FacultyAssignmentBase(BaseModel):
+class FacultyCourseAssignmentBase(BaseModel):
     faculty_id: int
     course_id: int
     academic_year: str
     semester: int
     is_active: bool = True
 
-class FacultyAssignmentCreate(FacultyAssignmentBase):
+class FacultyCourseAssignmentCreate(FacultyCourseAssignmentBase):
     pass
 
-class FacultyAssignmentUpdate(BaseModel):
+class FacultyCourseAssignmentUpdate(BaseModel):
     academic_year: Optional[str] = None
     semester: Optional[int] = None
     is_active: Optional[bool] = None
 
-class FacultyAssignment(FacultyAssignmentBase):
+class FacultyCourseAssignmentResponse(FacultyCourseAssignmentBase):
     id: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
-class Course(CourseBase):
+class CourseResponse(CourseBase):
     id: int
-    faculty_assignments: List[FacultyAssignment] = []
+    faculty_assignments: List[FacultyCourseAssignmentResponse] = []
     
     class Config:
-        orm_mode = True
+        from_attributes = True

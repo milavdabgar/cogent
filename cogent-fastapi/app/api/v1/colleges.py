@@ -8,7 +8,7 @@ from app.models.user import UserRole
 
 router = APIRouter()
 
-@router.get("/", response_model=List[college_schemas.College])
+@router.get("/", response_model=List[college_schemas.CollegeResponse])
 def get_colleges(
     db: Session = Depends(deps.get_db),
     current_user = Depends(deps.get_current_user),
@@ -22,7 +22,7 @@ def get_colleges(
     colleges = crud_college.get_colleges(db, skip=skip, limit=limit, search=search)
     return colleges
 
-@router.post("/", response_model=college_schemas.College)
+@router.post("/", response_model=college_schemas.CollegeResponse)
 def create_college(
     *,
     db: Session = Depends(deps.get_db),
@@ -32,8 +32,11 @@ def create_college(
     """
     Create new college.
     """
-    if current_user.role != UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    if current_user.role not in [UserRole.ADMIN, UserRole.DTE_ADMIN]:
+        raise HTTPException(
+            status_code=403,
+            detail="Not enough permissions to create college"
+        )
     
     college = crud_college.get_college_by_code(db, code=college_in.code)
     if college:
@@ -45,7 +48,7 @@ def create_college(
     college = crud_college.create_college(db, college=college_in)
     return college
 
-@router.get("/{college_id}", response_model=college_schemas.College)
+@router.get("/{college_id}", response_model=college_schemas.CollegeResponse)
 def get_college(
     college_id: int,
     db: Session = Depends(deps.get_db),
@@ -59,7 +62,7 @@ def get_college(
         raise HTTPException(status_code=404, detail="College not found")
     return college
 
-@router.put("/{college_id}", response_model=college_schemas.College)
+@router.put("/{college_id}", response_model=college_schemas.CollegeResponse)
 def update_college(
     *,
     db: Session = Depends(deps.get_db),
@@ -70,8 +73,11 @@ def update_college(
     """
     Update college.
     """
-    if current_user.role != UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    if current_user.role not in [UserRole.ADMIN, UserRole.DTE_ADMIN]:
+        raise HTTPException(
+            status_code=403,
+            detail="Not enough permissions to update college"
+        )
     
     college = crud_college.get_college(db, college_id=college_id)
     if not college:
@@ -99,18 +105,21 @@ def delete_college(
     """
     Delete college.
     """
-    if current_user.role != UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    if current_user.role not in [UserRole.ADMIN, UserRole.DTE_ADMIN]:
+        raise HTTPException(
+            status_code=403,
+            detail="Not enough permissions to delete college"
+        )
     
     college = crud_college.get_college(db, college_id=college_id)
     if not college:
         raise HTTPException(status_code=404, detail="College not found")
     
-    college = crud_college.delete_college(db, college_id=college_id)
-    return {"message": "College successfully deactivated"}
+    crud_college.delete_college(db, college_id=college_id)
+    return {"message": "College deleted successfully"}
 
 # Department endpoints
-@router.get("/departments/", response_model=List[college_schemas.Department])
+@router.get("/departments", response_model=List[college_schemas.DepartmentResponse])
 def get_departments(
     db: Session = Depends(deps.get_db),
     current_user = Depends(deps.get_current_user),
@@ -126,7 +135,7 @@ def get_departments(
     )
     return departments
 
-@router.post("/departments/", response_model=college_schemas.Department)
+@router.post("/departments", response_model=college_schemas.DepartmentResponse)
 def create_department(
     *,
     db: Session = Depends(deps.get_db),
@@ -136,13 +145,16 @@ def create_department(
     """
     Create new department.
     """
-    if current_user.role != UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    if current_user.role not in [UserRole.ADMIN, UserRole.DTE_ADMIN]:
+        raise HTTPException(
+            status_code=403,
+            detail="Not enough permissions to create department"
+        )
     
     department = crud_college.create_department(db, department=department_in)
     return department
 
-@router.put("/departments/{department_id}", response_model=college_schemas.Department)
+@router.put("/departments/{department_id}", response_model=college_schemas.DepartmentResponse)
 def update_department(
     *,
     db: Session = Depends(deps.get_db),
@@ -153,16 +165,17 @@ def update_department(
     """
     Update department.
     """
-    if current_user.role != UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    if current_user.role not in [UserRole.ADMIN, UserRole.DTE_ADMIN]:
+        raise HTTPException(
+            status_code=403,
+            detail="Not enough permissions to update department"
+        )
     
     department = crud_college.get_department(db, department_id=department_id)
     if not department:
         raise HTTPException(status_code=404, detail="Department not found")
     
-    department = crud_college.update_department(
-        db, db_obj=department, obj_in=department_in
-    )
+    department = crud_college.update_department(db, db_obj=department, obj_in=department_in)
     return department
 
 @router.delete("/departments/{department_id}")
@@ -175,12 +188,15 @@ def delete_department(
     """
     Delete department.
     """
-    if current_user.role != UserRole.ADMIN:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    if current_user.role not in [UserRole.ADMIN, UserRole.DTE_ADMIN]:
+        raise HTTPException(
+            status_code=403,
+            detail="Not enough permissions to delete department"
+        )
     
     department = crud_college.get_department(db, department_id=department_id)
     if not department:
         raise HTTPException(status_code=404, detail="Department not found")
     
-    department = crud_college.delete_department(db, department_id=department_id)
-    return {"message": "Department successfully deactivated"}
+    crud_college.delete_department(db, department_id=department_id)
+    return {"message": "Department deleted successfully"}

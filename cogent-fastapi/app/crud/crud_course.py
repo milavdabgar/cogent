@@ -1,7 +1,12 @@
 from typing import List, Optional, Union, Dict, Any
 from sqlalchemy.orm import Session
 from app.models.course import Course, FacultyCourseAssignment
-from app.schemas.course import CourseCreate, CourseUpdate, FacultyAssignmentCreate, FacultyAssignmentUpdate
+from app.schemas.course import (
+    CourseCreate,
+    CourseUpdate,
+    FacultyCourseAssignmentCreate,
+    FacultyCourseAssignmentUpdate
+)
 
 def get_course(db: Session, course_id: int) -> Optional[Course]:
     return db.query(Course).filter(Course.id == course_id).first()
@@ -97,7 +102,7 @@ def get_faculty_assignments(
     
     return query.offset(skip).limit(limit).all()
 
-def create_faculty_assignment(db: Session, assignment: FacultyAssignmentCreate) -> FacultyCourseAssignment:
+def create_faculty_assignment(db: Session, assignment: FacultyCourseAssignmentCreate) -> FacultyCourseAssignment:
     db_assignment = FacultyCourseAssignment(**assignment.dict())
     db.add(db_assignment)
     db.commit()
@@ -107,7 +112,7 @@ def create_faculty_assignment(db: Session, assignment: FacultyAssignmentCreate) 
 def update_faculty_assignment(
     db: Session,
     db_obj: FacultyCourseAssignment,
-    obj_in: Union[FacultyAssignmentUpdate, Dict[str, Any]]
+    obj_in: Union[FacultyCourseAssignmentUpdate, Dict[str, Any]]
 ) -> FacultyCourseAssignment:
     if isinstance(obj_in, dict):
         update_data = obj_in

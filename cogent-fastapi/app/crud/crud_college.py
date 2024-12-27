@@ -107,3 +107,12 @@ def delete_department(db: Session, department_id: int) -> Department:
         db.commit()
         db.refresh(department)
     return department
+
+def delete_department(db: Session, department_id: int) -> Department:
+    department = get_department(db, department_id)
+    if department:
+        department.is_active = False
+        db.add(department)
+        db.commit()
+        db.refresh(department)
+    return department

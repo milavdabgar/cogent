@@ -1,6 +1,92 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
+// Role-specific navigation items
+const getNavItems = (role) => {
+  switch (role) {
+    case 'dte_admin':
+      return [
+        {
+          title: 'Dashboard',
+          icon: 'mdi-view-dashboard',
+          to: '/dashboard/dte-admin'
+        },
+        {
+          title: 'Colleges',
+          icon: 'mdi-office-building',
+          to: '/dashboard/dte-admin/colleges'
+        },
+        {
+          title: 'Departments',
+          icon: 'mdi-domain',
+          to: '/dashboard/dte-admin/departments'
+        }
+      ]
+    case 'admin':
+      return [
+        {
+          title: 'Dashboard',
+          icon: 'mdi-view-dashboard',
+          to: '/dashboard/admin'
+        },
+        {
+          title: 'Users',
+          icon: 'mdi-account-group',
+          to: '/dashboard/admin/users'
+        },
+        {
+          title: 'Colleges',
+          icon: 'mdi-office-building',
+          to: '/dashboard/admin/colleges'
+        },
+        {
+          title: 'Courses',
+          icon: 'mdi-book-open-variant',
+          to: '/dashboard/admin/courses'
+        },
+        {
+          title: 'Settings',
+          icon: 'mdi-cog',
+          to: '/dashboard/admin/settings'
+        }
+      ]
+    case 'principal':
+      return [
+        {
+          title: 'Dashboard',
+          icon: 'mdi-view-dashboard',
+          to: '/dashboard/principal'
+        }
+      ]
+    case 'hod':
+      return [
+        {
+          title: 'Dashboard',
+          icon: 'mdi-view-dashboard',
+          to: '/dashboard/hod'
+        }
+      ]
+    case 'faculty':
+      return [
+        {
+          title: 'Dashboard',
+          icon: 'mdi-view-dashboard',
+          to: '/dashboard/faculty'
+        }
+      ]
+    case 'student':
+      return [
+        {
+          title: 'Dashboard',
+          icon: 'mdi-view-dashboard',
+          to: '/dashboard/student'
+        }
+      ]
+    default:
+      return []
+  }
+}
+
 const routes = [
   {
     path: '/',
@@ -22,53 +108,61 @@ const routes = [
     name: 'PasswordReset',
     component: () => import('@/views/auth/PasswordResetView.vue')
   },
+  // Protected routes with base layout
   {
-    path: '/profile',
-    name: 'Profile',
-    component: () => import('@/views/auth/ProfileView.vue'),
-    meta: { requiresAuth: true }
+    path: '/dashboard',
+    component: () => import('@/layouts/BaseDashboardLayout.vue'),
+    props: (route) => {
+      const authStore = useAuthStore()
+      return {
+        title: 'Profile Settings',
+        navigationItems: getNavItems(authStore.userRole)
+      }
+    },
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('@/views/auth/ProfileView.vue'),
+        meta: { requiresAuth: true }
+      }
+    ]
   },
+  // DTE Admin routes
   {
-    path: '/dashboard/faculty',
-    name: 'FacultyDashboard',
-    component: () => import('@/views/dashboards/FacultyDashboard.vue'),
-    meta: { requiresAuth: true, role: 'faculty' }
+    path: '/dashboard/dte-admin',
+    component: () => import('@/layouts/DashboardLayout.vue'),
+    meta: { requiresAuth: true, roles: ['dte_admin'] },
+    children: [
+      {
+        path: '',
+        name: 'DTEAdminDashboard',
+        component: () => import('@/views/dashboards/DTEAdminDashboard.vue')
+      },
+      {
+        path: 'colleges',
+        name: 'DTEAdminColleges',
+        component: () => import('@/views/dte-admin/CollegeList.vue')
+      },
+      {
+        path: 'departments',
+        name: 'DTEAdminDepartments',
+        component: () => import('@/views/dte-admin/DepartmentList.vue')
+      }
+    ]
   },
-  {
-    path: '/dashboard/student',
-    name: 'StudentDashboard',
-    component: () => import('@/views/dashboards/StudentDashboard.vue'),
-    meta: { requiresAuth: true, role: 'student' }
-  },
-  {
-    path: '/dashboard/hod',
-    name: 'HODDashboard',
-    component: () => import('@/views/dashboards/HODDashboard.vue'),
-    meta: { requiresAuth: true, role: 'hod' }
-  },
-  {
-    path: '/dashboard/lab-assistant',
-    name: 'LabAssistantDashboard',
-    component: () => import('@/views/dashboards/LabAssistantDashboard.vue'),
-    meta: { requiresAuth: true, role: 'lab_assistant' }
-  },
-  {
-    path: '/dashboard/principal',
-    name: 'PrincipalDashboard',
-    component: () => import('@/views/dashboards/PrincipalDashboard.vue'),
-    meta: { requiresAuth: true, role: 'principal' }
-  },
+  // Admin routes
   {
     path: '/dashboard/admin',
-    name: 'AdminDashboard',
-    component: () => import('@/views/dashboards/AdminDashboard.vue'),
-    meta: { requiresAuth: true, role: 'admin' }
-  },
-  // Admin management routes
-  {
-    path: '/admin',
+    component: () => import('@/layouts/AdminDashboardLayout.vue'),
     meta: { requiresAuth: true, role: 'admin' },
     children: [
+      {
+        path: '',
+        name: 'AdminDashboard',
+        component: () => import('@/views/dashboards/AdminDashboard.vue')
+      },
       {
         path: 'users',
         name: 'ManageUsers',
@@ -90,6 +184,71 @@ const routes = [
         component: () => import('@/views/admin/SystemSettings.vue')
       }
     ]
+  },
+  // Other role dashboards
+  {
+    path: '/dashboard/faculty',
+    component: () => import('@/layouts/BaseDashboardLayout.vue'),
+    props: {
+      title: 'Faculty Portal',
+      navigationItems: getNavItems('faculty')
+    },
+    children: [
+      {
+        path: '',
+        name: 'FacultyDashboard',
+        component: () => import('@/views/dashboards/FacultyDashboard.vue'),
+        meta: { requiresAuth: true, role: 'faculty' }
+      }
+    ]
+  },
+  {
+    path: '/dashboard/student',
+    component: () => import('@/layouts/BaseDashboardLayout.vue'),
+    props: {
+      title: 'Student Portal',
+      navigationItems: getNavItems('student')
+    },
+    children: [
+      {
+        path: '',
+        name: 'StudentDashboard',
+        component: () => import('@/views/dashboards/StudentDashboard.vue'),
+        meta: { requiresAuth: true, role: 'student' }
+      }
+    ]
+  },
+  {
+    path: '/dashboard/hod',
+    component: () => import('@/layouts/BaseDashboardLayout.vue'),
+    props: {
+      title: 'HOD Portal',
+      navigationItems: getNavItems('hod')
+    },
+    children: [
+      {
+        path: '',
+        name: 'HODDashboard',
+        component: () => import('@/views/dashboards/HODDashboard.vue'),
+        meta: { requiresAuth: true, role: 'hod' }
+      }
+    ]
+  },
+  {
+    path: '/dashboard/principal',
+    component: () => import('@/layouts/BaseDashboardLayout.vue'),
+    props: {
+      title: 'Principal Portal',
+      navigationItems: getNavItems('principal')
+    },
+    children: [
+      {
+        path: '',
+        name: 'PrincipalDashboard',
+        component: () => import('@/views/dashboards/PrincipalDashboard.vue'),
+        meta: { requiresAuth: true, role: 'principal' }
+      }
+    ]
   }
 ]
 
@@ -102,9 +261,11 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next({ name: 'Login', query: { redirect: to.fullPath } })
-  } else if (to.meta.role && authStore.userRole !== to.meta.role) {
-    next({ name: authStore.defaultRoute })
+    next('/login')
+  } else if (to.meta.role && !authStore.hasRole(to.meta.role)) {
+    next(authStore.defaultRoute)
+  } else if (to.meta.roles && !authStore.hasAnyRole(to.meta.roles)) {
+    next(authStore.defaultRoute)
   } else {
     next()
   }

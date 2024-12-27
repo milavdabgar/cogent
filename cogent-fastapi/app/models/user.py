@@ -4,6 +4,7 @@ from app.db.base_class import Base
 import enum
 
 class UserRole(str, enum.Enum):
+    DTE_ADMIN = "dte_admin"
     ADMIN = "admin"
     PRINCIPAL = "principal"
     HOD = "hod"
@@ -26,6 +27,7 @@ class User(Base):
     last_login = Column(Date, nullable=True)
     
     # Role specific details
+    dte_admin_details = relationship("DTEAdminDetails", back_populates="user", uselist=False)
     admin_details = relationship("AdminDetails", back_populates="user", uselist=False)
     principal_details = relationship("PrincipalDetails", back_populates="user", uselist=False)
     hod_details = relationship("HODDetails", back_populates="user", uselist=False)
@@ -101,3 +103,14 @@ class AdminDetails(Base):
     access_level = Column(String)  # Can be used to define different admin access levels
     
     user = relationship("User", back_populates="admin_details")
+
+class DTEAdminDetails(Base):
+    __tablename__ = "dte_admin_details"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    jurisdiction = Column(String)  # e.g., "Gujarat"
+    date_of_joining = Column(Date)
+    access_level = Column(String)
+    
+    user = relationship("User", back_populates="dte_admin_details")

@@ -39,8 +39,20 @@ class StudentDetailsBase(BaseModel):
     date_of_admission: date
     current_semester: int
 
+class DTEAdminDetailsBase(BaseModel):
+    jurisdiction: str
+    date_of_joining: date
+    access_level: str
+
+class AdminDetailsBase(BaseModel):
+    super_admin: bool = False
+    date_of_joining: date
+    access_level: str
+
 class UserCreate(UserBase):
     password: str
+    dte_admin_details: Optional[DTEAdminDetailsBase] = None
+    admin_details: Optional[AdminDetailsBase] = None
     principal_details: Optional[PrincipalDetailsBase] = None
     hod_details: Optional[HODDetailsBase] = None
     faculty_details: Optional[FacultyDetailsBase] = None
@@ -83,6 +95,18 @@ class UserCreate(UserBase):
             raise ValueError('Lab Assistant role requires lab assistant details')
         return v
 
+    @validator('dte_admin_details', always=True)
+    def validate_dte_admin_details(cls, v, values):
+        if values.get('role') == UserRole.DTE_ADMIN and not v:
+            raise ValueError('DTE Admin role requires DTE Admin details')
+        return v
+
+    @validator('admin_details', always=True)
+    def validate_admin_details(cls, v, values):
+        if values.get('role') == UserRole.ADMIN and not v:
+            raise ValueError('Admin role requires Admin details')
+        return v
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
@@ -104,6 +128,25 @@ class UserResponse(UserBase):
     faculty_details: Optional[FacultyDetailsBase] = None
     lab_assistant_details: Optional[LabAssistantDetailsBase] = None
     student_details: Optional[StudentDetailsBase] = None
+    dte_admin_details: Optional[DTEAdminDetailsBase] = None
+    admin_details: Optional[AdminDetailsBase] = None
 
     class Config:
         from_attributes = True
+
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    phone_number: Optional[str] = None
+    date_of_birth: Optional[date] = None
+    role: Optional[UserRole] = None
+    is_active: Optional[bool] = None
+    password: Optional[str] = None
+    principal_details: Optional[PrincipalDetailsBase] = None
+    hod_details: Optional[HODDetailsBase] = None
+    faculty_details: Optional[FacultyDetailsBase] = None
+    lab_assistant_details: Optional[LabAssistantDetailsBase] = None
+    student_details: Optional[StudentDetailsBase] = None
+    dte_admin_details: Optional[DTEAdminDetailsBase] = None
+    admin_details: Optional[AdminDetailsBase] = None

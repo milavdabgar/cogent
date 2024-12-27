@@ -5,7 +5,7 @@ from app.core.security import get_password_hash, verify_password
 from app.models.user import User, UserRole
 from app.models.college import College
 from app.models.course import Course
-from app.schemas.admin import UserCreate, UserUpdate
+from app.schemas.user import UserCreate, UserUpdate
 
 def get_user(db: Session, id: int) -> Optional[User]:
     return db.query(User).filter(User.id == id).first()
