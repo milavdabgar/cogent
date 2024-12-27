@@ -192,10 +192,11 @@ const snackbar = ref({
 })
 
 onMounted(async () => {
-  await Promise.all([
-    dteAdminStore.fetchDepartments(),
-    dteAdminStore.fetchColleges()
-  ])
+  try {
+    await dteAdminStore.fetchDepartments()
+  } catch (error) {
+    showError('Failed to load departments')
+  }
 })
 
 const showAddModal = () => {

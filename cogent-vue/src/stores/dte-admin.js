@@ -4,7 +4,15 @@ import axios from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
-axios.defaults.baseURL = `${API_URL}/api/v1`
+// Remove /api/v1 from baseURL since we'll include it in the endpoints
+axios.defaults.baseURL = API_URL
+
+// API endpoints
+const API_ENDPOINTS = {
+  stats: '/api/v1/dte-admin/stats',
+  colleges: '/api/v1/dte-admin/colleges',
+  departments: '/api/v1/dte-admin/departments'
+}
 
 export const useDTEAdminStore = defineStore('dte-admin', {
   state: () => ({
@@ -19,7 +27,7 @@ export const useDTEAdminStore = defineStore('dte-admin', {
     async fetchStats() {
       this.loading = true
       try {
-        const response = await axios.get('/dte-admin/stats')
+        const response = await axios.get(API_ENDPOINTS.stats)
         this.stats = response.data
         this.error = null
       } catch (error) {
@@ -33,7 +41,7 @@ export const useDTEAdminStore = defineStore('dte-admin', {
     async fetchColleges(params = {}) {
       this.loading = true
       try {
-        const response = await axios.get('/dte-admin/colleges', { params })
+        const response = await axios.get(API_ENDPOINTS.colleges, { params })
         this.colleges = response.data
         this.error = null
       } catch (error) {
@@ -47,7 +55,7 @@ export const useDTEAdminStore = defineStore('dte-admin', {
     async createCollege(collegeData) {
       this.loading = true
       try {
-        const response = await axios.post('/dte-admin/colleges', collegeData)
+        const response = await axios.post(API_ENDPOINTS.colleges, collegeData)
         this.colleges.push(response.data)
         this.error = null
         return response.data
@@ -63,7 +71,7 @@ export const useDTEAdminStore = defineStore('dte-admin', {
     async updateCollege(collegeId, collegeData) {
       this.loading = true
       try {
-        const response = await axios.put(`/dte-admin/colleges/${collegeId}`, collegeData)
+        const response = await axios.put(`${API_ENDPOINTS.colleges}/${collegeId}`, collegeData)
         const index = this.colleges.findIndex(c => c.id === collegeId)
         if (index !== -1) {
           this.colleges[index] = response.data
@@ -82,7 +90,7 @@ export const useDTEAdminStore = defineStore('dte-admin', {
     async deleteCollege(collegeId) {
       this.loading = true
       try {
-        await axios.delete(`/dte-admin/colleges/${collegeId}`)
+        await axios.delete(`${API_ENDPOINTS.colleges}/${collegeId}`)
         this.colleges = this.colleges.filter(c => c.id !== collegeId)
         this.error = null
       } catch (error) {
@@ -97,10 +105,15 @@ export const useDTEAdminStore = defineStore('dte-admin', {
     async fetchDepartments(params = {}) {
       this.loading = true
       try {
-        const response = await axios.get('/dte-admin/departments', { params })
+        // First ensure colleges are loaded
+        if (this.colleges.length === 0) {
+          await this.fetchColleges()
+        }
+        
+        const response = await axios.get(API_ENDPOINTS.departments, { params })
         this.departments = response.data.map(dept => ({
           ...dept,
-          college_name: this.colleges.find(c => c.id === dept.college_id)?.name || ''
+          college_name: this.colleges.find(c => c.id === dept.college_id)?.name || 'Unknown College'
         }))
         this.error = null
       } catch (error) {
@@ -114,8 +127,11 @@ export const useDTEAdminStore = defineStore('dte-admin', {
     async createDepartment(departmentData) {
       this.loading = true
       try {
-        const response = await axios.post('/dte-admin/departments', departmentData)
-        this.departments.push(response.data)
+        const response = await axios.post(API_ENDPOINTS.departments, departmentData)
+        this.departments.push({
+          ...response.data,
+          college_name: this.colleges.find(c => c.id === response.data.college_id)?.name || 'Unknown College'
+        })
         this.error = null
         return response.data
       } catch (error) {
@@ -130,10 +146,13 @@ export const useDTEAdminStore = defineStore('dte-admin', {
     async updateDepartment(departmentId, departmentData) {
       this.loading = true
       try {
-        const response = await axios.put(`/dte-admin/departments/${departmentId}`, departmentData)
+        const response = await axios.put(`${API_ENDPOINTS.departments}/${departmentId}`, departmentData)
         const index = this.departments.findIndex(d => d.id === departmentId)
         if (index !== -1) {
-          this.departments[index] = response.data
+          this.departments[index] = {
+            ...response.data,
+            college_name: this.colleges.find(c => c.id === response.data.college_id)?.name || 'Unknown College'
+          }
         }
         this.error = null
         return response.data
@@ -149,7 +168,7 @@ export const useDTEAdminStore = defineStore('dte-admin', {
     async deleteDepartment(departmentId) {
       this.loading = true
       try {
-        await axios.delete(`/dte-admin/departments/${departmentId}`)
+        await axios.delete(`${API_ENDPOINTS.departments}/${departmentId}`)
         this.departments = this.departments.filter(d => d.id !== departmentId)
         this.error = null
       } catch (error) {
