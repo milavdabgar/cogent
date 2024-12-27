@@ -12,7 +12,7 @@
             <v-window v-model="activeTab">
               <!-- Profile Tab -->
               <v-window-item value="profile">
-                <v-form @submit.prevent="handleProfileUpdate" v-model="profileForm.valid">
+                <v-form @submit.prevent="handleSubmit" v-model="profileForm.valid">
                   <v-row>
                     <!-- Edit Mode Toggle -->
                     <v-col cols="12" class="text-right">
@@ -30,9 +30,11 @@
                         v-model="profileForm.first_name"
                         label="First Name"
                         :readonly="!isEditing"
-                        :rules="[v => !!v || 'First name is required']"
                         variant="outlined"
                         :class="{ 'editable': isEditing }"
+                        :rules="[v => !!v || 'First name is required']"
+                        :loading="authStore.loading"
+                        :error-messages="authStore.error"
                       />
                     </v-col>
                     <v-col cols="12" md="6">
@@ -40,9 +42,9 @@
                         v-model="profileForm.last_name"
                         label="Last Name"
                         :readonly="!isEditing"
-                        :rules="[v => !!v || 'Last name is required']"
                         variant="outlined"
                         :class="{ 'editable': isEditing }"
+                        :rules="[v => !!v || 'Last name is required']"
                       />
                     </v-col>
                     <v-col cols="12" md="6">
@@ -76,7 +78,7 @@
                     </v-col>
 
                     <!-- Role-specific fields -->
-                    <template v-if="profileStore.profile?.role === 'student'">
+                    <template v-if="authStore.profile?.role === 'student'">
                       <v-col cols="12" md="6">
                         <v-text-field
                           v-model="profileForm.student_details.enrollment_number"
@@ -124,7 +126,7 @@
                       </v-col>
                     </template>
 
-                    <template v-if="profileStore.profile?.role === 'faculty'">
+                    <template v-if="authStore.profile?.role === 'faculty'">
                       <v-col cols="12" md="6">
                         <v-text-field
                           v-model="profileForm.faculty_details.department"
@@ -168,7 +170,7 @@
                       </v-col>
                     </template>
 
-                    <template v-if="profileStore.profile?.role === 'hod'">
+                    <template v-if="authStore.profile?.role === 'hod'">
                       <v-col cols="12" md="6">
                         <v-text-field
                           v-model="profileForm.hod_details.department"
@@ -213,7 +215,7 @@
                       </v-col>
                     </template>
 
-                    <template v-if="profileStore.profile?.role === 'principal'">
+                    <template v-if="authStore.profile?.role === 'principal'">
                       <v-col cols="12" md="6">
                         <v-text-field
                           v-model="profileForm.principal_details.qualification"
@@ -244,11 +246,12 @@
                           variant="outlined"
                           :class="{ 'editable': isEditing }"
                           prepend-icon="mdi-calendar"
+                          :rules="[v => !!v || 'Date of joining is required']"
                         />
                       </v-col>
                     </template>
 
-                    <template v-if="profileStore.profile?.role === 'lab_assistant'">
+                    <template v-if="authStore.profile?.role === 'lab_assistant'">
                       <v-col cols="12" md="6">
                         <v-text-field
                           v-model="profileForm.lab_assistant_details.department"
@@ -287,7 +290,7 @@
                       <v-btn
                         color="primary"
                         type="submit"
-                        :loading="profileStore.loading"
+                        :loading="authStore.loading"
                         :disabled="!profileForm.valid"
                       >
                         Save Changes
@@ -337,7 +340,7 @@
                     <v-btn
                       color="primary"
                       type="submit"
-                      :loading="profileStore.loading"
+                      :loading="authStore.loading"
                       :disabled="!passwordForm.valid"
                     >
                       Change Password
@@ -371,14 +374,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useProfileStore } from '@/stores/profile'
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 
-const profileStore = useProfileStore()
-const authStore = useAuthStore()
 const router = useRouter()
+
+const authStore = useAuthStore()
 
 const passwordFormRef = ref(null)
 
@@ -445,59 +447,38 @@ const formatDate = (date) => {
 
 onMounted(async () => {
   try {
-    await profileStore.fetchProfile()
-    if (profileStore.profile) {
-      const { first_name, last_name, email, phone_number, date_of_birth } = profileStore.profile
-      
-      profileForm.value.first_name = first_name
-      profileForm.value.last_name = last_name
-      profileForm.value.email = email
-      profileForm.value.phone_number = phone_number
-      profileForm.value.date_of_birth = formatDate(date_of_birth)
-
-      // Set role-specific fields
-      if (profileStore.profile.role === 'student' && profileStore.profile.student_details) {
-        const { enrollment_number, department, date_of_admission, current_semester } = profileStore.profile.student_details
-        profileForm.value.student_details.enrollment_number = enrollment_number
-        profileForm.value.student_details.department = department
-        profileForm.value.student_details.date_of_admission = formatDate(date_of_admission)
-        profileForm.value.student_details.current_semester = current_semester
-      } else if (profileStore.profile.role === 'faculty' && profileStore.profile.faculty_details) {
-        const { department, date_of_joining, qualification, specialization } = profileStore.profile.faculty_details
-        profileForm.value.faculty_details.department = department
-        profileForm.value.faculty_details.date_of_joining = formatDate(date_of_joining)
-        profileForm.value.faculty_details.qualification = qualification
-        profileForm.value.faculty_details.specialization = specialization
-      } else if (profileStore.profile.role === 'hod' && profileStore.profile.hod_details) {
-        const { department, date_of_joining, qualification, experience_years } = profileStore.profile.hod_details
-        profileForm.value.hod_details.department = department
-        profileForm.value.hod_details.date_of_joining = formatDate(date_of_joining)
-        profileForm.value.hod_details.qualification = qualification
-        profileForm.value.hod_details.experience_years = experience_years
-      } else if (profileStore.profile.role === 'principal' && profileStore.profile.principal_details) {
-        const { date_of_joining, qualification, experience_years } = profileStore.profile.principal_details
-        profileForm.value.principal_details.date_of_joining = formatDate(date_of_joining)
-        profileForm.value.principal_details.qualification = qualification
-        profileForm.value.principal_details.experience_years = experience_years
-      } else if (profileStore.profile.role === 'lab_assistant' && profileStore.profile.lab_assistant_details) {
-        const { department, date_of_joining, lab_type } = profileStore.profile.lab_assistant_details
-        profileForm.value.lab_assistant_details.department = department
-        profileForm.value.lab_assistant_details.date_of_joining = formatDate(date_of_joining)
-        profileForm.value.lab_assistant_details.lab_type = lab_type
-      }
-    }
+    await authStore.fetchProfile()
+    initializeForm()
   } catch (error) {
     console.error('Error fetching profile:', error)
     showError('Failed to load profile')
   }
 })
 
+const handleSubmit = async () => {
+  try {
+    await authStore.updateProfile(profileForm.value)
+    isEditing.value = false
+    snackbar.value = {
+      show: true,
+      text: 'Profile updated successfully',
+      color: 'success'
+    }
+  } catch (error) {
+    snackbar.value = {
+      show: true,
+      text: error.message || 'Failed to update profile',
+      color: 'error'
+    }
+  }
+}
+
 const toggleEditMode = () => {
   if (isEditing.value) {
     // Reset form when canceling edit
-    if (profileStore.profile) {
+    if (authStore.profile) {
       // Reset basic fields
-      const { first_name, last_name, email, phone_number, date_of_birth } = profileStore.profile
+      const { first_name, last_name, email, phone_number, date_of_birth } = authStore.profile
       
       profileForm.value.first_name = first_name
       profileForm.value.last_name = last_name
@@ -506,31 +487,39 @@ const toggleEditMode = () => {
       profileForm.value.date_of_birth = formatDate(date_of_birth)
 
       // Reset role-specific fields
-      if (profileStore.profile.role === 'student' && profileStore.profile.student_details) {
-        const { enrollment_number, department, date_of_admission, current_semester } = profileStore.profile.student_details
+      if (authStore.profile.role === 'student' && authStore.profile.student_details) {
+        const { enrollment_number, department, date_of_admission, current_semester } = authStore.profile.student_details
         profileForm.value.student_details.enrollment_number = enrollment_number
         profileForm.value.student_details.department = department
         profileForm.value.student_details.date_of_admission = formatDate(date_of_admission)
         profileForm.value.student_details.current_semester = current_semester
-      } else if (profileStore.profile.role === 'faculty' && profileStore.profile.faculty_details) {
-        const { department, date_of_joining, qualification, specialization } = profileStore.profile.faculty_details
+      } else if (authStore.profile.role === 'faculty' && authStore.profile.faculty_details) {
+        const { department, date_of_joining, qualification, specialization } = authStore.profile.faculty_details
         profileForm.value.faculty_details.department = department
         profileForm.value.faculty_details.date_of_joining = formatDate(date_of_joining)
         profileForm.value.faculty_details.qualification = qualification
         profileForm.value.faculty_details.specialization = specialization
-      } else if (profileStore.profile.role === 'hod' && profileStore.profile.hod_details) {
-        const { department, date_of_joining, qualification, experience_years } = profileStore.profile.hod_details
+      } else if (authStore.profile.role === 'hod' && authStore.profile.hod_details) {
+        const { department, date_of_joining, qualification, experience_years } = authStore.profile.hod_details
         profileForm.value.hod_details.department = department
         profileForm.value.hod_details.date_of_joining = formatDate(date_of_joining)
         profileForm.value.hod_details.qualification = qualification
         profileForm.value.hod_details.experience_years = experience_years
-      } else if (profileStore.profile.role === 'principal' && profileStore.profile.principal_details) {
-        const { date_of_joining, qualification, experience_years } = profileStore.profile.principal_details
+      } else if (authStore.profile.role === 'principal') {
+        // Initialize principal_details if null
+        if (!authStore.profile.principal_details) {
+          authStore.profile.principal_details = {
+            qualification: '',
+            experience_years: null,
+            date_of_joining: null
+          }
+        }
+        const { date_of_joining, qualification, experience_years } = authStore.profile.principal_details || {}
         profileForm.value.principal_details.date_of_joining = formatDate(date_of_joining)
-        profileForm.value.principal_details.qualification = qualification
-        profileForm.value.principal_details.experience_years = experience_years
-      } else if (profileStore.profile.role === 'lab_assistant' && profileStore.profile.lab_assistant_details) {
-        const { department, date_of_joining, lab_type } = profileStore.profile.lab_assistant_details
+        profileForm.value.principal_details.qualification = qualification || ''
+        profileForm.value.principal_details.experience_years = experience_years || null
+      } else if (authStore.profile.role === 'lab_assistant' && authStore.profile.lab_assistant_details) {
+        const { department, date_of_joining, lab_type } = authStore.profile.lab_assistant_details
         profileForm.value.lab_assistant_details.department = department
         profileForm.value.lab_assistant_details.date_of_joining = formatDate(date_of_joining)
         profileForm.value.lab_assistant_details.lab_type = lab_type
@@ -540,62 +529,9 @@ const toggleEditMode = () => {
   isEditing.value = !isEditing.value
 }
 
-const handleProfileUpdate = async () => {
-  try {
-    const updateData = {
-      first_name: profileForm.value.first_name,
-      last_name: profileForm.value.last_name,
-      phone_number: profileForm.value.phone_number,
-      date_of_birth: profileForm.value.date_of_birth
-    }
-
-    if (profileStore.profile?.role === 'student') {
-      updateData.student_details = {
-        enrollment_number: profileForm.value.student_details.enrollment_number,
-        department: profileForm.value.student_details.department,
-        date_of_admission: profileForm.value.student_details.date_of_admission,
-        current_semester: profileForm.value.student_details.current_semester
-      }
-    } else if (profileStore.profile?.role === 'faculty') {
-      updateData.faculty_details = {
-        department: profileForm.value.faculty_details.department,
-        date_of_joining: profileForm.value.faculty_details.date_of_joining,
-        qualification: profileForm.value.faculty_details.qualification,
-        specialization: profileForm.value.faculty_details.specialization
-      }
-    } else if (profileStore.profile?.role === 'hod') {
-      updateData.hod_details = {
-        department: profileForm.value.hod_details.department,
-        date_of_joining: profileForm.value.hod_details.date_of_joining,
-        qualification: profileForm.value.hod_details.qualification,
-        experience_years: profileForm.value.hod_details.experience_years
-      }
-    } else if (profileStore.profile?.role === 'principal') {
-      updateData.principal_details = {
-        date_of_joining: profileForm.value.principal_details.date_of_joining,
-        qualification: profileForm.value.principal_details.qualification,
-        experience_years: profileForm.value.principal_details.experience_years
-      }
-    } else if (profileStore.profile?.role === 'lab_assistant') {
-      updateData.lab_assistant_details = {
-        department: profileForm.value.lab_assistant_details.department,
-        date_of_joining: profileForm.value.lab_assistant_details.date_of_joining,
-        lab_type: profileForm.value.lab_assistant_details.lab_type
-      }
-    }
-
-    await profileStore.updateProfile(updateData)
-    showSuccess('Profile updated successfully')
-    isEditing.value = false
-  } catch (error) {
-    console.error('Error updating profile:', error)
-    showError('Failed to update profile')
-  }
-}
-
 async function handlePasswordChange() {
   try {
-    await profileStore.changePassword({
+    await authStore.changePassword({
       current_password: passwordForm.value.current_password,
       new_password: passwordForm.value.new_password,
       confirm_password: passwordForm.value.confirm_password
@@ -612,11 +548,10 @@ async function handlePasswordChange() {
     if (passwordFormRef.value) {
       passwordFormRef.value.reset()
     }
-    // Wait for 2 seconds to show the success message before redirecting
-    setTimeout(async () => {
-      await authStore.logout()
-      router.push('/login')
-    }, 2000)
+    // Wait for success message then logout and redirect
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    await authStore.logout()
+    await router.push('/login')
   } catch (error) {
     console.error('Error changing password:', error)
     showError(error.response?.data?.detail || 'Failed to change password')
@@ -636,6 +571,57 @@ function showError(text) {
     show: true,
     text,
     color: 'error'
+  }
+}
+
+function initializeForm() {
+  if (authStore.profile) {
+    const { first_name, last_name, email, phone_number, date_of_birth } = authStore.profile
+    
+    profileForm.value.first_name = first_name
+    profileForm.value.last_name = last_name
+    profileForm.value.email = email
+    profileForm.value.phone_number = phone_number
+    profileForm.value.date_of_birth = formatDate(date_of_birth)
+
+    // Set role-specific fields
+    if (authStore.profile.role === 'student' && authStore.profile.student_details) {
+      const { enrollment_number, department, date_of_admission, current_semester } = authStore.profile.student_details
+      profileForm.value.student_details.enrollment_number = enrollment_number
+      profileForm.value.student_details.department = department
+      profileForm.value.student_details.date_of_admission = formatDate(date_of_admission)
+      profileForm.value.student_details.current_semester = current_semester
+    } else if (authStore.profile.role === 'faculty' && authStore.profile.faculty_details) {
+      const { department, date_of_joining, qualification, specialization } = authStore.profile.faculty_details
+      profileForm.value.faculty_details.department = department
+      profileForm.value.faculty_details.date_of_joining = formatDate(date_of_joining)
+      profileForm.value.faculty_details.qualification = qualification
+      profileForm.value.faculty_details.specialization = specialization
+    } else if (authStore.profile.role === 'hod' && authStore.profile.hod_details) {
+      const { department, date_of_joining, qualification, experience_years } = authStore.profile.hod_details
+      profileForm.value.hod_details.department = department
+      profileForm.value.hod_details.date_of_joining = formatDate(date_of_joining)
+      profileForm.value.hod_details.qualification = qualification
+      profileForm.value.hod_details.experience_years = experience_years
+    } else if (authStore.profile.role === 'principal') {
+      // Initialize principal_details if null
+      if (!authStore.profile.principal_details) {
+        authStore.profile.principal_details = {
+          qualification: '',
+          experience_years: null,
+          date_of_joining: null
+        }
+      }
+      const { date_of_joining, qualification, experience_years } = authStore.profile.principal_details || {}
+      profileForm.value.principal_details.date_of_joining = formatDate(date_of_joining)
+      profileForm.value.principal_details.qualification = qualification || ''
+      profileForm.value.principal_details.experience_years = experience_years || null
+    } else if (authStore.profile.role === 'lab_assistant' && authStore.profile.lab_assistant_details) {
+      const { department, date_of_joining, lab_type } = authStore.profile.lab_assistant_details
+      profileForm.value.lab_assistant_details.department = department
+      profileForm.value.lab_assistant_details.date_of_joining = formatDate(date_of_joining)
+      profileForm.value.lab_assistant_details.lab_type = lab_type
+    }
   }
 }
 </script>

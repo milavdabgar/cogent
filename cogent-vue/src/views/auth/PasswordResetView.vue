@@ -4,18 +4,18 @@
       <v-col cols="12" sm="8" md="6" lg="4">
         <v-card class="elevation-12">
           <v-card-title class="text-center py-4">
-            {{ hasToken ? 'Reset Your Password' : 'Request Password Reset' }}
+            {{ step === 1 ? 'Request Password Reset' : 'Reset Your Password' }}
           </v-card-title>
           
           <v-card-text>
             <!-- Request Password Reset Form -->
             <v-form
-              v-if="!hasToken"
+              v-if="step === 1"
               @submit.prevent="handleRequestReset"
               v-model="requestForm.valid"
             >
               <v-text-field
-                v-model="requestForm.email"
+                v-model="email"
                 label="Email"
                 type="email"
                 :rules="[
@@ -30,7 +30,7 @@
                 type="submit"
                 block
                 class="mt-4"
-                :loading="profileStore.loading"
+                :loading="loading"
                 :disabled="!requestForm.valid"
               >
                 Request Reset
@@ -44,7 +44,7 @@
               v-model="resetForm.valid"
             >
               <v-text-field
-                v-model="resetForm.new_password"
+                v-model="newPassword"
                 label="New Password"
                 type="password"
                 :rules="[
@@ -55,12 +55,12 @@
               />
               
               <v-text-field
-                v-model="resetForm.confirm_password"
+                v-model="confirmPassword"
                 label="Confirm Password"
                 type="password"
                 :rules="[
                   v => !!v || 'Please confirm your password',
-                  v => v === resetForm.new_password || 'Passwords must match'
+                  v => v === newPassword || 'Passwords must match'
                 ]"
                 required
               />
@@ -70,7 +70,7 @@
                 type="submit"
                 block
                 class="mt-4"
-                :loading="profileStore.loading"
+                :loading="loading"
                 :disabled="!resetForm.valid"
               >
                 Reset Password
@@ -115,23 +115,27 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useProfileStore } from '@/stores/profile'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const router = useRouter()
-const profileStore = useProfileStore()
+const authStore = useAuthStore()
 
-const hasToken = computed(() => !!route.query.token)
+const email = ref('')
+const token = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+const step = ref(1)
+const error = ref('')
+const success = ref('')
+const loading = ref(false)
 
 const requestForm = ref({
-  valid: true,
-  email: ''
+  valid: true
 })
 
 const resetForm = ref({
-  valid: true,
-  new_password: '',
-  confirm_password: ''
+  valid: true
 })
 
 const snackbar = ref({
@@ -142,25 +146,31 @@ const snackbar = ref({
 
 async function handleRequestReset() {
   try {
-    await profileStore.requestPasswordReset(requestForm.value.email)
-    showSuccess('If the email exists, you will receive password reset instructions')
-    requestForm.value.email = ''
-  } catch (error) {
-    showError('Failed to request password reset')
+    loading.value = true
+    error.value = ''
+    await authStore.requestPasswordReset(email.value)
+    success.value = 'Password reset link has been sent to your email'
+    step.value = 2
+  } catch (err) {
+    error.value = err.message || 'Failed to request password reset'
+  } finally {
+    loading.value = false
   }
 }
 
 async function handleResetPassword() {
   try {
-    await profileStore.confirmPasswordReset(
-      route.query.token,
-      resetForm.value.new_password,
-      resetForm.value.confirm_password
-    )
-    showSuccess('Password reset successfully')
-    router.push({ name: 'login' })
-  } catch (error) {
-    showError('Failed to reset password')
+    loading.value = true
+    error.value = ''
+    await authStore.confirmPasswordReset(token.value, newPassword.value, confirmPassword.value)
+    success.value = 'Password has been reset successfully'
+    setTimeout(() => {
+      router.push('/login')
+    }, 2000)
+  } catch (err) {
+    error.value = err.message || 'Failed to reset password'
+  } finally {
+    loading.value = false
   }
 }
 

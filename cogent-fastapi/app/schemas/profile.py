@@ -30,6 +30,14 @@ class HODDetails(BaseModel):
     class Config:
         from_attributes = True
 
+class PrincipalDetails(BaseModel):
+    qualification: Optional[str] = None
+    date_of_joining: Optional[date] = None
+    experience_years: Optional[int] = None
+    
+    class Config:
+        from_attributes = True
+
 class LabAssistantDetails(BaseModel):
     department: Optional[str] = None
     lab_type: Optional[str] = None
@@ -49,6 +57,7 @@ class ProfileUpdate(BaseModel):
     student_details: Optional[StudentDetails] = None
     faculty_details: Optional[FacultyDetails] = None
     hod_details: Optional[HODDetails] = None
+    principal_details: Optional[PrincipalDetails] = None
     lab_assistant_details: Optional[LabAssistantDetails] = None
     
     class Config:
@@ -80,6 +89,7 @@ class ProfileResponse(BaseModel):
     student_details: Optional[StudentDetails] = None
     faculty_details: Optional[FacultyDetails] = None
     hod_details: Optional[HODDetails] = None
+    principal_details: Optional[PrincipalDetails] = None
     lab_assistant_details: Optional[LabAssistantDetails] = None
     
     class Config:

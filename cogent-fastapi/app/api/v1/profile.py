@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Any
 from app.core.security import get_current_user, get_password_hash, verify_password
 from app.db.session import get_db
-from app.models.user import User, UserRole, StudentDetails, FacultyDetails, HODDetails, LabAssistantDetails
+from app.models.user import User, UserRole, StudentDetails, FacultyDetails, HODDetails, LabAssistantDetails, PrincipalDetails
 from app.schemas.profile import (
     ProfileUpdate,
     ProfileResponse,
@@ -28,6 +28,8 @@ async def get_profile(
         db.refresh(current_user.faculty_details)
     elif current_user.role == UserRole.HOD and current_user.hod_details:
         db.refresh(current_user.hod_details)
+    elif current_user.role == UserRole.PRINCIPAL and current_user.principal_details:
+        db.refresh(current_user.principal_details)
     elif current_user.role == UserRole.LAB_ASSISTANT and current_user.lab_assistant_details:
         db.refresh(current_user.lab_assistant_details)
     
@@ -79,6 +81,16 @@ async def update_profile(
             hod_details = update_data.get('hod_details', {})
             for field, value in hod_details.items():
                 setattr(current_user.hod_details, field, value)
+    
+    elif current_user.role == UserRole.PRINCIPAL:
+        if not current_user.principal_details:
+            current_user.principal_details = PrincipalDetails(user_id=current_user.id)
+            db.add(current_user.principal_details)
+            
+        if profile_update.principal_details:
+            principal_details = update_data.get('principal_details', {})
+            for field, value in principal_details.items():
+                setattr(current_user.principal_details, field, value)
     
     elif current_user.role == UserRole.LAB_ASSISTANT:
         if not current_user.lab_assistant_details:
