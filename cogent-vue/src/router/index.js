@@ -132,7 +132,11 @@ const routes = [
   // DTE Admin routes
   {
     path: '/dashboard/dte-admin',
-    component: () => import('@/layouts/DashboardLayout.vue'),
+    component: () => import('@/layouts/BaseDashboardLayout.vue'),
+    props: {
+      title: 'DTE Admin Portal',
+      navigationItems: getNavItems('dte_admin')
+    },
     meta: { requiresAuth: true, roles: ['dte_admin'] },
     children: [
       {
