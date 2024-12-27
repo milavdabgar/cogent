@@ -42,13 +42,21 @@
 
               <v-select
                 v-model="role"
-                :items="roles"
-                item-title="text"
+                :items="[
+                  { title: 'DTE Admin', value: 'DTE_ADMIN' },
+                  { title: 'GTU Admin', value: 'GTU_ADMIN' },
+                  { title: 'Principal', value: 'PRINCIPAL' },
+                  { title: 'HOD', value: 'HOD' },
+                  { title: 'Faculty', value: 'FACULTY' },
+                  { title: 'Lab Assistant', value: 'LAB_ASSISTANT' },
+                  { title: 'Student', value: 'STUDENT' }
+                ]"
+                item-title="title"
                 item-value="value"
                 label="Role"
                 prepend-icon="mdi-account"
-                :rules="roleRules"
                 required
+                :rules="[v => !!v || 'Role is required']"
               ></v-select>
             </v-form>
           </v-card-text>
@@ -120,20 +128,6 @@ const emailRules = [
 const passwordRules = [
   v => !!v || 'Password is required',
   v => v.length >= 6 || 'Password must be at least 6 characters'
-]
-
-const roleRules = [
-  v => !!v || 'Role is required'
-]
-
-const roles = [
-  { text: 'DTE Admin', value: 'dte_admin' },
-  { text: 'Admin', value: 'admin' },
-  { text: 'Principal', value: 'principal' },
-  { text: 'HOD', value: 'hod' },
-  { text: 'Faculty', value: 'faculty' },
-  { text: 'Lab Assistant', value: 'lab_assistant' },
-  { text: 'Student', value: 'student' }
 ]
 
 const handleSubmit = async () => {

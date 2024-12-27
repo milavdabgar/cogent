@@ -1,87 +1,68 @@
 <template>
-  <v-container fluid>
+  <v-container>
     <v-row>
-      <!-- Summary Stats -->
-      <v-col cols="12" sm="6" md="3">
-        <v-card>
+      <!-- Statistics Cards -->
+      <v-col cols="12" sm="6" lg="3">
+        <v-card class="mx-auto" max-width="344">
           <v-card-text>
-            <div class="text-subtitle-1">Total Colleges</div>
-            <div class="text-h4">{{ stats.totalColleges }}</div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6" md="3">
-        <v-card>
-          <v-card-text>
-            <div class="text-subtitle-1">Total Departments</div>
-            <div class="text-h4">{{ stats.totalDepartments }}</div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6" md="3">
-        <v-card>
-          <v-card-text>
-            <div class="text-subtitle-1">Active Students</div>
-            <div class="text-h4">{{ stats.activeStudents }}</div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6" md="3">
-        <v-card>
-          <v-card-text>
-            <div class="text-subtitle-1">Active Faculty</div>
-            <div class="text-h4">{{ stats.activeFaculty }}</div>
+            <div class="text-subtitle-1 text-medium-emphasis">Total Colleges</div>
+            <div class="text-h4 text-primary">{{ totalColleges }}</div>
           </v-card-text>
         </v-card>
       </v-col>
 
-      <!-- Quick Actions -->
-      <v-col cols="12">
-        <v-card>
-          <v-card-title>Quick Actions</v-card-title>
+      <v-col cols="12" sm="6" lg="3">
+        <v-card class="mx-auto" max-width="344">
           <v-card-text>
-            <v-row>
-              <v-col cols="12" sm="6" md="3">
-                <v-btn
-                  block
-                  color="primary"
-                  to="/dashboard/dte-admin/colleges"
-                  class="mb-2"
-                >
-                  <v-icon start>mdi-office-building</v-icon>
-                  Manage Colleges
-                </v-btn>
-              </v-col>
-              <v-col cols="12" sm="6" md="3">
-                <v-btn
-                  block
-                  color="secondary"
-                  to="/dashboard/dte-admin/departments"
-                  class="mb-2"
-                >
-                  <v-icon start>mdi-domain</v-icon>
-                  Manage Departments
-                </v-btn>
-              </v-col>
-            </v-row>
+            <div class="text-subtitle-1 text-medium-emphasis">Active Students</div>
+            <div class="text-h4 text-primary">{{ activeStudents }}</div>
           </v-card-text>
         </v-card>
       </v-col>
 
-      <!-- Recent Activities -->
-      <v-col cols="12">
-        <v-card>
-          <v-card-title>Recent Activities</v-card-title>
-          <v-list>
-            <v-list-item
-              v-for="activity in recentActivities"
-              :key="activity.id"
-              :title="activity.title"
-              :subtitle="activity.description"
-              :prepend-icon="activity.icon || 'mdi-bell'"
-            />
-          </v-list>
+      <v-col cols="12" sm="6" lg="3">
+        <v-card class="mx-auto" max-width="344">
+          <v-card-text>
+            <div class="text-subtitle-1 text-medium-emphasis">Active Faculty</div>
+            <div class="text-h4 text-primary">{{ activeFaculty }}</div>
+          </v-card-text>
         </v-card>
+      </v-col>
+    </v-row>
+
+    <!-- Quick Actions -->
+    <v-row class="mt-6">
+      <v-col cols="12">
+        <h2 class="text-h5 mb-4">Quick Actions</h2>
+        <v-btn
+          color="primary"
+          class="mr-4"
+          :to="{ name: 'colleges' }"
+        >
+          MANAGE COLLEGES
+        </v-btn>
+      </v-col>
+    </v-row>
+
+    <!-- Recent Activities -->
+    <v-row class="mt-6">
+      <v-col cols="12">
+        <h2 class="text-h5 mb-4">Recent Activities</h2>
+        <v-timeline side="end">
+          <v-timeline-item
+            v-for="activity in recentActivities"
+            :key="activity.id"
+            :dot-color="activity.color"
+            size="small"
+          >
+            <div class="d-flex">
+              <div>
+                <div class="text-h6">{{ activity.title }}</div>
+                <div class="text-caption">{{ activity.description }}</div>
+              </div>
+            </div>
+          </v-timeline-item>
+        </v-timeline>
       </v-col>
     </v-row>
   </v-container>
@@ -93,42 +74,33 @@ import { useDTEAdminStore } from '@/stores/dte-admin'
 
 const dteAdminStore = useDTEAdminStore()
 
-const stats = ref({
-  totalColleges: 0,
-  totalDepartments: 0,
-  activeStudents: 0,
-  activeFaculty: 0
-})
-
+const totalColleges = ref(0)
+const activeStudents = ref(0)
+const activeFaculty = ref(0)
 const recentActivities = ref([
   {
     id: 1,
     title: 'New College Added',
     description: 'Added GTU College of Engineering',
-    icon: 'mdi-office-building'
+    color: 'primary',
   },
-  {
-    id: 2,
-    title: 'Department Updated',
-    description: 'Updated Computer Science Department',
-    icon: 'mdi-domain'
-  }
 ])
 
-// Fetch initial data
 onMounted(async () => {
   try {
-    await dteAdminStore.fetchColleges()
-    await dteAdminStore.fetchDepartments()
-    // Update stats from actual data
-    stats.value = {
-      totalColleges: dteAdminStore.colleges.length,
-      totalDepartments: dteAdminStore.departments.length,
-      activeStudents: 0, // These will be implemented later
-      activeFaculty: 0
-    }
+    const stats = await dteAdminStore.fetchDashboardStats()
+    totalColleges.value = stats.total_colleges || 0
+    activeStudents.value = stats.active_students || 0
+    activeFaculty.value = stats.active_faculty || 0
   } catch (error) {
     console.error('Error fetching dashboard data:', error)
   }
 })
 </script>
+
+<style scoped>
+.v-timeline {
+  max-height: 400px;
+  overflow-y: auto;
+}
+</style>

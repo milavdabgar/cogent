@@ -5,6 +5,7 @@ import enum
 
 class UserRole(str, enum.Enum):
     DTE_ADMIN = "dte_admin"
+    GTU_ADMIN = "gtu_admin"
     ADMIN = "admin"
     PRINCIPAL = "principal"
     HOD = "hod"
@@ -34,6 +35,7 @@ class User(Base):
     faculty_details = relationship("FacultyDetails", back_populates="user", uselist=False)
     lab_assistant_details = relationship("LabAssistantDetails", back_populates="user", uselist=False)
     student_details = relationship("StudentDetails", back_populates="user", uselist=False)
+    gtu_admin_details = relationship("GTUAdminDetails", back_populates="user", uselist=False)
 
 class PrincipalDetails(Base):
     __tablename__ = "principal_details"
@@ -114,3 +116,14 @@ class DTEAdminDetails(Base):
     access_level = Column(String)
     
     user = relationship("User", back_populates="dte_admin_details")
+
+class GTUAdminDetails(Base):
+    __tablename__ = "gtu_admin_details"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    jurisdiction = Column(String)  # e.g., "Gujarat"
+    date_of_joining = Column(Date)
+    access_level = Column(String)
+    
+    user = relationship("User", back_populates="gtu_admin_details")

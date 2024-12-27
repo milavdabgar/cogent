@@ -14,7 +14,7 @@ async def get_colleges(
     skip: int = 0,
     limit: int = 100,
     search: Optional[str] = None,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(deps.get_current_active_dte_admin),
     db: Session = Depends(deps.get_db),
 ):
     """Get all colleges"""
@@ -26,46 +26,36 @@ async def get_colleges(
 @router.post("/colleges", response_model=CollegeResponse)
 async def create_college(
     college: CollegeCreate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(deps.get_current_active_dte_admin),
     db: Session = Depends(deps.get_db),
 ):
     """Create a new college"""
-    college = college_crud.create_college(db, college=college)
+    college = college_crud.create(db, obj_in=college)
     return college
 
 @router.put("/colleges/{college_id}", response_model=CollegeResponse)
 async def update_college(
     college_id: int,
     college: CollegeUpdate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(deps.get_current_active_dte_admin),
     db: Session = Depends(deps.get_db),
 ):
     """Update a college"""
-    db_college = college_crud.update_college(db, college_id=college_id, college=college)
+    db_college = college_crud.get(db, id=college_id)
     if not db_college:
         raise HTTPException(status_code=404, detail="College not found")
-    return db_college
+    college = college_crud.update(db, db_obj=db_college, obj_in=college)
+    return college
 
 @router.delete("/colleges/{college_id}")
 async def delete_college(
     college_id: int,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(deps.get_current_active_dte_admin),
     db: Session = Depends(deps.get_db),
 ):
     """Delete a college"""
-    success = college_crud.delete_college(db, college_id=college_id)
-    if not success:
+    db_college = college_crud.get(db, id=college_id)
+    if not db_college:
         raise HTTPException(status_code=404, detail="College not found")
-    return {"message": "College deleted successfully"}
-
-@router.get("/colleges/{college_id}", response_model=CollegeResponse)
-async def get_college(
-    college_id: int,
-    current_user: User = Depends(deps.get_current_active_user),
-    db: Session = Depends(deps.get_db),
-):
-    """Get a specific college"""
-    college = college_crud.get_college(db, college_id=college_id)
-    if not college:
-        raise HTTPException(status_code=404, detail="College not found")
-    return college
+    college = college_crud.remove(db, id=college_id)
+    return {"status": "success"}

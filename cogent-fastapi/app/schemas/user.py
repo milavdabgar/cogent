@@ -44,6 +44,11 @@ class DTEAdminDetailsBase(BaseModel):
     date_of_joining: date
     access_level: str
 
+class GTUAdminDetailsBase(BaseModel):
+    jurisdiction: str
+    date_of_joining: date
+    access_level: str
+
 class AdminDetailsBase(BaseModel):
     super_admin: bool = False
     date_of_joining: date
@@ -58,6 +63,7 @@ class UserCreate(UserBase):
     faculty_details: Optional[FacultyDetailsBase] = None
     lab_assistant_details: Optional[LabAssistantDetailsBase] = None
     student_details: Optional[StudentDetailsBase] = None
+    gtu_admin_details: Optional[GTUAdminDetailsBase] = None
 
     @validator('password')
     def password_min_length(cls, v):
@@ -101,6 +107,12 @@ class UserCreate(UserBase):
             raise ValueError('DTE Admin role requires DTE Admin details')
         return v
 
+    @validator('gtu_admin_details', always=True)
+    def validate_gtu_admin_details(cls, v, values):
+        if values.get('role') == UserRole.GTU_ADMIN and not v:
+            raise ValueError('GTU Admin role requires GTU Admin details')
+        return v
+
     @validator('admin_details', always=True)
     def validate_admin_details(cls, v, values):
         if values.get('role') == UserRole.ADMIN and not v:
@@ -116,7 +128,7 @@ class UserLogin(BaseModel):
     def validate_role(cls, v):
         if v:
             try:
-                role_key = v.replace(' ', '_').upper()
+                role_key = v.upper().replace(' ', '_')
                 return UserRole[role_key]
             except KeyError:
                 raise ValueError('Invalid role')
@@ -139,6 +151,7 @@ class UserResponse(UserBase):
     lab_assistant_details: Optional[LabAssistantDetailsBase] = None
     student_details: Optional[StudentDetailsBase] = None
     dte_admin_details: Optional[DTEAdminDetailsBase] = None
+    gtu_admin_details: Optional[GTUAdminDetailsBase] = None
     admin_details: Optional[AdminDetailsBase] = None
 
     class Config:
@@ -159,4 +172,5 @@ class UserUpdate(BaseModel):
     lab_assistant_details: Optional[LabAssistantDetailsBase] = None
     student_details: Optional[StudentDetailsBase] = None
     dte_admin_details: Optional[DTEAdminDetailsBase] = None
+    gtu_admin_details: Optional[GTUAdminDetailsBase] = None
     admin_details: Optional[AdminDetailsBase] = None

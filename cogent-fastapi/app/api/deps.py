@@ -70,12 +70,18 @@ def get_current_active_dte_admin(
         )
     return current_user
 
-def get_current_active_gtu_admin(
+async def get_current_active_gtu_admin(
     current_user: User = Depends(get_current_user),
 ) -> User:
-    if not current_user.role == UserRole.GTU_ADMIN:
+    """
+    Returns the current user if they are an active GTU admin.
+    Raises HTTPException if the user is not active or not a GTU admin.
+    """
+    if not current_user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    if current_user.role != UserRole.GTU_ADMIN:
         raise HTTPException(
-            status_code=400, detail="The user doesn't have enough privileges"
+            status_code=403, detail="The user doesn't have enough privileges"
         )
     return current_user
 
