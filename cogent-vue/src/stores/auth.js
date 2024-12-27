@@ -134,7 +134,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         this.loading = true
         this.error = null
-        const response = await api.get('/profile/me')
+        const response = await api.get('/auth/profile/me')
         this.profile = response.data
         return response.data
       } catch (err) {
@@ -201,7 +201,7 @@ export const useAuthStore = defineStore('auth', {
           }
         }
 
-        const response = await api.put('/profile/me', updateData)
+        const response = await api.put('/auth/profile/me', updateData)
         this.profile = response.data
         return response.data
       } catch (err) {
@@ -217,7 +217,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         this.loading = true
         this.error = null
-        const response = await api.post('/profile/change-password', passwordData)
+        const response = await api.post('/auth/profile/change-password', passwordData)
         return response.data
       } catch (err) {
         this.error = err.response?.data?.detail || 'Failed to change password'
@@ -232,7 +232,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         this.loading = true
         this.error = null
-        const response = await api.post('/auth/request-password-reset', { email })
+        const response = await api.post('/auth/profile/reset-password', { email })
         return response.data
       } catch (err) {
         this.error = err.response?.data?.detail || 'Failed to request password reset'
@@ -250,9 +250,10 @@ export const useAuthStore = defineStore('auth', {
         if (newPassword !== confirmPassword) {
           throw new Error('Passwords do not match')
         }
-        const response = await api.post('/auth/reset-password', {
+        const response = await api.post('/auth/profile/reset-password/confirm', {
           token,
-          new_password: newPassword
+          new_password: newPassword,
+          confirm_password: confirmPassword
         })
         return response.data
       } catch (err) {

@@ -333,3 +333,39 @@ Below is a detailed breakdown of all roles and the features, functions, and task
 ------
 
 By structuring the portal with these roles and associated tasks, the system can ensure a smooth workflow for academic, administrative, and operational processes at every level.
+
+/api/v1/gtu-admin/
+  departments/
+    GET    /                   # List all departments
+    POST   /                   # Create department
+    GET    /{id}              # Get department details
+    PUT    /{id}              # Update department
+    DELETE /{id}              # Delete department
+
+  degree-levels/
+    GET    /                   # List all degree levels
+    POST   /                   # Create degree level
+    GET    /{id}              # Get degree level details
+    PUT    /{id}              # Update degree level
+    DELETE /{id}              # Delete degree level
+
+  degree-programs/
+    GET    /                   # List all degree programs
+    POST   /                   # Create degree program
+    GET    /{id}              # Get program details
+    PUT    /{id}              # Update program
+    DELETE /{id}              # Delete program
+    GET    /{id}/subjects     # Get subjects in program
+
+  subjects/
+    GET    /                   # List all subjects
+    POST   /                   # Create subject
+    GET    /{id}              # Get subject details
+    PUT    /{id}              # Update subject
+    DELETE /{id}              # Delete subject
+
+  program-subjects/
+    GET    /program/{program_id}  # Get subjects mapped to program
+    POST   /                      # Map subject to program
+    PUT    /{id}                 # Update subject mapping
+    DELETE /{id}                 # Remove subject from program

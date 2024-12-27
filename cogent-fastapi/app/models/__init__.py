@@ -1,19 +1,15 @@
-from app.models.user import User, UserRole, AdminDetails, PrincipalDetails, HODDetails, FacultyDetails, LabAssistantDetails, StudentDetails
+from app.models.user import User, UserRole
 from app.models.college import College, Department
-from app.models.course import Course, CourseType, FacultyCourseAssignment
+from app.models.academic import AcademicDepartment, DegreeLevel, DegreeProgram, Subject, ProgramSubject
 
 __all__ = [
     "User",
     "UserRole",
-    "AdminDetails",
-    "PrincipalDetails",
-    "HODDetails",
-    "FacultyDetails",
-    "LabAssistantDetails",
-    "StudentDetails",
     "College",
     "Department",
-    "Course",
-    "CourseType",
-    "FacultyCourseAssignment"
+    "AcademicDepartment",
+    "DegreeLevel", 
+    "DegreeProgram",
+    "Subject",
+    "ProgramSubject"
 ]

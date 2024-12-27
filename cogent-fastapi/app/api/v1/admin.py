@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.api import deps
@@ -20,19 +20,13 @@ def get_admin_stats(
     """
     # Get stats from database
     total_users = crud_user.count_total_users(db)
-    total_colleges = crud_user.count_total_colleges(db)
     active_students = crud_user.count_active_students(db)
     active_faculty = crud_user.count_active_faculty(db)
-    total_courses = crud_user.count_total_courses(db)
-    total_labs = crud_user.count_total_labs(db)
     
     return {
         "total_users": total_users,
-        "total_colleges": total_colleges,
         "active_students": active_students,
-        "active_faculty": active_faculty,
-        "total_courses": total_courses,
-        "total_labs": total_labs
+        "active_faculty": active_faculty
     }
 
 @router.get("/users", response_model=List[admin_schemas.UserInDB])

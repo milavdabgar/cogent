@@ -53,11 +53,8 @@ class UserInDB(BaseModel):
 
 class AdminStats(BaseModel):
     total_users: int
-    total_colleges: int
     active_students: int
     active_faculty: int
-    total_courses: int
-    total_labs: int
 
 class SystemHealth(BaseModel):
     service_name: str

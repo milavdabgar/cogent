@@ -7,28 +7,16 @@ from app.schemas.user import (
     Token,
     TokenData
 )
+from app.schemas.token import (
+    Token,
+    TokenPayload
+)
 from app.schemas.profile import (
     ProfileUpdate,
     ProfileResponse,
     PasswordChange,
     PasswordReset,
     PasswordResetConfirm
-)
-from app.schemas.college import (
-    CollegeCreate,
-    CollegeUpdate,
-    CollegeResponse,
-    DepartmentCreate,
-    DepartmentUpdate,
-    DepartmentResponse
-)
-from app.schemas.course import (
-    CourseCreate,
-    CourseUpdate,
-    CourseResponse,
-    FacultyCourseAssignmentCreate,
-    FacultyCourseAssignmentUpdate,
-    FacultyCourseAssignmentResponse
 )
 
 __all__ = [
@@ -39,21 +27,10 @@ __all__ = [
     "UserLogin",
     "Token",
     "TokenData",
+    "TokenPayload",
     "ProfileUpdate",
     "ProfileResponse",
     "PasswordChange",
     "PasswordReset",
-    "PasswordResetConfirm",
-    "CollegeCreate",
-    "CollegeUpdate",
-    "CollegeResponse",
-    "DepartmentCreate",
-    "DepartmentUpdate",
-    "DepartmentResponse",
-    "CourseCreate",
-    "CourseUpdate",
-    "CourseResponse",
-    "FacultyCourseAssignmentCreate",
-    "FacultyCourseAssignmentUpdate",
-    "FacultyCourseAssignmentResponse"
+    "PasswordResetConfirm"
 ]

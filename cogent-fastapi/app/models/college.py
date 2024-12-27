@@ -33,4 +33,3 @@ class Department(Base):
     # Relationships
     college = relationship("College", back_populates="departments")
     hod = relationship("User", foreign_keys=[hod_id])
-    courses = relationship("Course", back_populates="department")
