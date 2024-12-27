@@ -4,7 +4,35 @@ import { useAuthStore } from '@/stores/auth'
 // Role-specific navigation items
 const getNavItems = (role) => {
   switch (role) {
-    case 'dte_admin':
+    case 'GTU_ADMIN':
+      return [
+        {
+          title: 'Dashboard',
+          icon: 'mdi-view-dashboard',
+          to: '/dashboard/gtu-admin'
+        },
+        {
+          title: 'Departments',
+          icon: 'mdi-domain',
+          to: '/dashboard/gtu-admin/departments'
+        },
+        {
+          title: 'Degree Levels',
+          icon: 'mdi-school',
+          to: '/dashboard/gtu-admin/degree-levels'
+        },
+        {
+          title: 'Degree Programs',
+          icon: 'mdi-book-education',
+          to: '/dashboard/gtu-admin/degree-programs'
+        },
+        {
+          title: 'Subjects',
+          icon: 'mdi-book-open-variant',
+          to: '/dashboard/gtu-admin/subjects'
+        }
+      ]
+    case 'DTE_ADMIN':
       return [
         {
           title: 'Dashboard',
@@ -22,7 +50,7 @@ const getNavItems = (role) => {
           to: '/dashboard/dte-admin/departments'
         }
       ]
-    case 'admin':
+    case 'ADMIN':
       return [
         {
           title: 'Dashboard',
@@ -50,7 +78,7 @@ const getNavItems = (role) => {
           to: '/dashboard/admin/settings'
         }
       ]
-    case 'principal':
+    case 'PRINCIPAL':
       return [
         {
           title: 'Dashboard',
@@ -58,7 +86,7 @@ const getNavItems = (role) => {
           to: '/dashboard/principal'
         }
       ]
-    case 'hod':
+    case 'HOD':
       return [
         {
           title: 'Dashboard',
@@ -66,7 +94,7 @@ const getNavItems = (role) => {
           to: '/dashboard/hod'
         }
       ]
-    case 'faculty':
+    case 'FACULTY':
       return [
         {
           title: 'Dashboard',
@@ -74,7 +102,7 @@ const getNavItems = (role) => {
           to: '/dashboard/faculty'
         }
       ]
-    case 'student':
+    case 'STUDENT':
       return [
         {
           title: 'Dashboard',
@@ -135,9 +163,9 @@ const routes = [
     component: () => import('@/layouts/BaseDashboardLayout.vue'),
     props: {
       title: 'DTE Admin Portal',
-      navigationItems: getNavItems('dte_admin')
+      navigationItems: getNavItems('DTE_ADMIN')
     },
-    meta: { requiresAuth: true, roles: ['dte_admin'] },
+    meta: { requiresAuth: true, roles: ['DTE_ADMIN'] },
     children: [
       {
         path: '',
@@ -156,11 +184,53 @@ const routes = [
       }
     ]
   },
+  // GTU Admin routes
+  {
+    path: '/dashboard/gtu-admin',
+    component: () => import('@/layouts/DashboardLayout.vue'),
+    props: {
+      title: 'GTU Admin Portal',
+      navigationItems: getNavItems('GTU_ADMIN')
+    },
+    meta: { requiresAuth: true, roles: ['GTU_ADMIN'] },
+    children: [
+      {
+        path: '',
+        name: 'GTUAdminDashboard',
+        component: () => import('@/views/dashboards/GTUAdminDashboard.vue'),
+        meta: { requiresAuth: true, roles: ['GTU_ADMIN'] }
+      },
+      {
+        path: 'departments',
+        name: 'GTUAdminDepartments',
+        component: () => import('@/views/gtu-admin/DepartmentList.vue'),
+        meta: { requiresAuth: true, roles: ['GTU_ADMIN'] }
+      },
+      {
+        path: 'degree-levels',
+        name: 'GTUAdminDegreeLevels',
+        component: () => import('@/views/gtu-admin/DegreeLevelList.vue'),
+        meta: { requiresAuth: true, roles: ['GTU_ADMIN'] }
+      },
+      {
+        path: 'degree-programs',
+        name: 'GTUAdminDegreePrograms',
+        component: () => import('@/views/gtu-admin/DegreeProgramList.vue'),
+        meta: { requiresAuth: true, roles: ['GTU_ADMIN'] }
+      },
+      {
+        path: 'subjects',
+        name: 'GTUAdminSubjects',
+        component: () => import('@/views/gtu-admin/SubjectList.vue'),
+        meta: { requiresAuth: true, roles: ['GTU_ADMIN'] }
+      }
+    ]
+  },
   // Admin routes
   {
     path: '/dashboard/admin',
     component: () => import('@/layouts/AdminDashboardLayout.vue'),
-    meta: { requiresAuth: true, role: 'admin' },
+    meta: { requiresAuth: true, role: 'ADMIN' },
     children: [
       {
         path: '',
@@ -195,14 +265,14 @@ const routes = [
     component: () => import('@/layouts/BaseDashboardLayout.vue'),
     props: {
       title: 'Faculty Portal',
-      navigationItems: getNavItems('faculty')
+      navigationItems: getNavItems('FACULTY')
     },
     children: [
       {
         path: '',
         name: 'FacultyDashboard',
         component: () => import('@/views/dashboards/FacultyDashboard.vue'),
-        meta: { requiresAuth: true, role: 'faculty' }
+        meta: { requiresAuth: true, role: 'FACULTY' }
       }
     ]
   },
@@ -211,14 +281,14 @@ const routes = [
     component: () => import('@/layouts/BaseDashboardLayout.vue'),
     props: {
       title: 'Student Portal',
-      navigationItems: getNavItems('student')
+      navigationItems: getNavItems('STUDENT')
     },
     children: [
       {
         path: '',
         name: 'StudentDashboard',
         component: () => import('@/views/dashboards/StudentDashboard.vue'),
-        meta: { requiresAuth: true, role: 'student' }
+        meta: { requiresAuth: true, role: 'STUDENT' }
       }
     ]
   },
@@ -227,14 +297,14 @@ const routes = [
     component: () => import('@/layouts/BaseDashboardLayout.vue'),
     props: {
       title: 'HOD Portal',
-      navigationItems: getNavItems('hod')
+      navigationItems: getNavItems('HOD')
     },
     children: [
       {
         path: '',
         name: 'HODDashboard',
         component: () => import('@/views/dashboards/HODDashboard.vue'),
-        meta: { requiresAuth: true, role: 'hod' }
+        meta: { requiresAuth: true, role: 'HOD' }
       }
     ]
   },
@@ -243,14 +313,14 @@ const routes = [
     component: () => import('@/layouts/BaseDashboardLayout.vue'),
     props: {
       title: 'Principal Portal',
-      navigationItems: getNavItems('principal')
+      navigationItems: getNavItems('PRINCIPAL')
     },
     children: [
       {
         path: '',
         name: 'PrincipalDashboard',
         component: () => import('@/views/dashboards/PrincipalDashboard.vue'),
-        meta: { requiresAuth: true, role: 'principal' }
+        meta: { requiresAuth: true, role: 'PRINCIPAL' }
       }
     ]
   }
@@ -264,13 +334,22 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   
+  // For debugging
+  console.log('Route meta:', to.meta)
+  console.log('User role:', authStore.userRole)
+  console.log('Is authenticated:', authStore.isAuthenticated)
+  
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    console.log('Not authenticated, redirecting to login')
     next('/login')
   } else if (to.meta.role && !authStore.hasRole(to.meta.role)) {
+    console.log('Wrong role, redirecting to default route')
     next(authStore.defaultRoute)
   } else if (to.meta.roles && !authStore.hasAnyRole(to.meta.roles)) {
+    console.log('Wrong roles, redirecting to default route')
     next(authStore.defaultRoute)
   } else {
+    console.log('Navigation allowed')
     next()
   }
 })

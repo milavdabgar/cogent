@@ -142,12 +142,22 @@ const handleSubmit = async () => {
       password: password.value,
       role: role.value
     })
+    
+    // For debugging
+    console.log('Login successful')
+    console.log('User role:', authStore.userRole)
+    console.log('Default route:', authStore.defaultRoute)
+    
     snackbar.value = {
       show: true,
       text: 'Login successful!',
       color: 'success'
     }
-    router.push(authStore.defaultRoute)
+    
+    // Add a small delay before navigation
+    setTimeout(() => {
+      router.push(authStore.defaultRoute)
+    }, 500)
   } catch (error) {
     console.error('Login failed:', error)
     if (error.response?.status === 401) {

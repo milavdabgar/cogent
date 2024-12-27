@@ -1,45 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import axios from 'axios'
-
-const API_URL = 'http://localhost:8000/api/v1'
-
-// Create axios instance with base URL and interceptors
-const api = axios.create({
-  baseURL: API_URL,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-})
-
-// Add request interceptor to add token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
-  }
-)
-
-// Add response interceptor to handle errors
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      const authStore = useAuthStore()
-      authStore.logout()
-      window.location.href = '/login'
-    }
-    return Promise.reject(error)
-  }
-)
+import { api } from '@/api'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -57,17 +18,19 @@ export const useAuthStore = defineStore('auth', {
     hasAnyRole: (state) => (roles) => roles.includes(state.role),
     defaultRoute: (state) => {
       switch (state.role) {
-        case 'dte_admin':
+        case 'DTE_ADMIN':
           return '/dashboard/dte-admin'
-        case 'admin':
-          return '/dashboard/admin'
-        case 'principal':
+        case 'GTU_ADMIN':
+          return '/dashboard/gtu-admin'
+        case 'PRINCIPAL':
           return '/dashboard/principal'
-        case 'hod':
+        case 'HOD':
           return '/dashboard/hod'
-        case 'faculty':
+        case 'FACULTY':
           return '/dashboard/faculty'
-        case 'student':
+        case 'LAB_ASSISTANT':
+          return '/dashboard/lab-assistant'
+        case 'STUDENT':
           return '/dashboard/student'
         default:
           return '/login'
