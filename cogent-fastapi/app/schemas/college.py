@@ -18,6 +18,7 @@ class CollegeCreate(CollegeBase):
 
 class CollegeUpdate(BaseModel):
     name: Optional[str] = None
+    code: Optional[str] = None
     address: Optional[str] = None
     city: Optional[str] = None
     state: Optional[str] = None

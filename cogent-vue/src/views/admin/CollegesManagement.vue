@@ -63,8 +63,8 @@
           <!-- Custom Column Slots -->
           <template v-slot:item.status="{ item }">
             <v-chip
-              :color="item.raw.is_active ? 'success' : 'error'"
-              :text="item.raw.is_active ? 'Active' : 'Inactive'"
+              :color="item.is_active ? 'success' : 'error'"
+              :text="item.is_active ? 'Active' : 'Inactive'"
               size="small"
             ></v-chip>
           </template>
@@ -75,7 +75,7 @@
               variant="text"
               size="small"
               color="primary"
-              @click="openEditDialog(item.raw)"
+              @click="openEditDialog(item)"
             >
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
@@ -83,10 +83,10 @@
               icon
               variant="text"
               size="small"
-              :color="item.raw.is_active ? 'error' : 'success'"
-              @click="toggleStatus(item.raw)"
+              :color="item.is_active ? 'error' : 'success'"
+              @click="toggleStatus(item)"
             >
-              <v-icon>{{ item.raw.is_active ? 'mdi-close' : 'mdi-check' }}</v-icon>
+              <v-icon>{{ item.is_active ? 'mdi-close' : 'mdi-check' }}</v-icon>
             </v-btn>
           </template>
         </v-data-table>
@@ -273,13 +273,13 @@ export default {
 
     // Table headers
     const headers = [
-      { title: 'Name', key: 'name', align: 'start', sortable: true },
-      { title: 'Code', key: 'code', align: 'start', sortable: true },
-      { title: 'City', key: 'city', align: 'start', sortable: true },
-      { title: 'State', key: 'state', align: 'start', sortable: true },
-      { title: 'Phone', key: 'phone', align: 'start', sortable: true },
-      { title: 'Status', key: 'status', align: 'center', sortable: false },
-      { title: 'Actions', key: 'actions', align: 'center', sortable: false }
+      { title: 'Name', key: 'name' },
+      { title: 'Code', key: 'code' },
+      { title: 'City', key: 'city' },
+      { title: 'State', key: 'state' },
+      { title: 'Phone', key: 'phone' },
+      { title: 'Status', key: 'status' },
+      { title: 'Actions', key: 'actions', sortable: false }
     ]
 
     // Form validation rules
@@ -344,14 +344,17 @@ export default {
         if (isEditing.value) {
           await axios.put(`/api/v1/colleges/${editedItem.value.id}`, editedItem.value)
           showSuccess('College updated successfully')
+          await fetchColleges()
+          closeDialog()
         } else {
           await axios.post('/api/v1/colleges/', editedItem.value)
           showSuccess('College added successfully')
+          await fetchColleges()
+          closeDialog()
         }
-        await fetchColleges()
-        closeDialog()
       } catch (error) {
-        showError(error.response?.data?.detail || 'Error saving college')
+        const errorMessage = error.response?.data?.detail || 'Error saving college'
+        showError(errorMessage)
         console.error('Error:', error)
       } finally {
         saving.value = false

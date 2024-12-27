@@ -77,6 +77,15 @@ def update_college(
     if not college:
         raise HTTPException(status_code=404, detail="College not found")
     
+    # Check if code is being updated and if it already exists
+    if college_in.code and college_in.code != college.code:
+        existing_college = crud_college.get_college_by_code(db, code=college_in.code)
+        if existing_college:
+            raise HTTPException(
+                status_code=400,
+                detail="A college with this code already exists"
+            )
+    
     college = crud_college.update_college(db, db_obj=college, obj_in=college_in)
     return college
 
