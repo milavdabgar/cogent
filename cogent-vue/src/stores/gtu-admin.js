@@ -16,7 +16,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async fetchDepartments() {
       try {
         this.loading = true
-        const response = await api.get('/api/v1/gtu-admin/departments')
+        const response = await api.get('/gtu-admin/departments')
         this.departments = response.data
         return response.data
       } catch (error) {
@@ -30,7 +30,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async createDepartment(data) {
       try {
         this.loading = true
-        const response = await api.post('/api/v1/gtu-admin/departments', data)
+        const response = await api.post('/gtu-admin/departments', data)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error creating department'
@@ -43,7 +43,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async updateDepartment(id, data) {
       try {
         this.loading = true
-        const response = await api.put(`/api/v1/gtu-admin/departments/${id}`, data)
+        const response = await api.put(`/gtu-admin/departments/${id}`, data)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error updating department'
@@ -56,7 +56,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async deleteDepartment(id) {
       try {
         this.loading = true
-        const response = await api.delete(`/api/v1/gtu-admin/departments/${id}`)
+        const response = await api.delete(`/gtu-admin/departments/${id}`)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error deleting department'
@@ -70,7 +70,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async fetchDegreeLevels() {
       try {
         this.loading = true
-        const response = await api.get('/api/v1/gtu-admin/degree-levels')
+        const response = await api.get('/gtu-admin/degree-levels')
         this.degreeLevels = response.data
         return response.data
       } catch (error) {
@@ -84,7 +84,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async createDegreeLevel(data) {
       try {
         this.loading = true
-        const response = await api.post('/api/v1/gtu-admin/degree-levels', data)
+        const response = await api.post('/gtu-admin/degree-levels', data)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error creating degree level'
@@ -97,7 +97,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async updateDegreeLevel(id, data) {
       try {
         this.loading = true
-        const response = await api.put(`/api/v1/gtu-admin/degree-levels/${id}`, data)
+        const response = await api.put(`/gtu-admin/degree-levels/${id}`, data)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error updating degree level'
@@ -110,7 +110,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async deleteDegreeLevel(id) {
       try {
         this.loading = true
-        const response = await api.delete(`/api/v1/gtu-admin/degree-levels/${id}`)
+        const response = await api.delete(`/gtu-admin/degree-levels/${id}`)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error deleting degree level'
@@ -124,7 +124,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async fetchDegreePrograms() {
       try {
         this.loading = true
-        const response = await api.get('/api/v1/gtu-admin/degree-programs')
+        const response = await api.get('/gtu-admin/degree-programs')
         this.degreePrograms = response.data
         return response.data
       } catch (error) {
@@ -138,7 +138,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async createDegreeProgram(data) {
       try {
         this.loading = true
-        const response = await api.post('/api/v1/gtu-admin/degree-programs', data)
+        const response = await api.post('/gtu-admin/degree-programs', data)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error creating degree program'
@@ -151,7 +151,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async updateDegreeProgram(id, data) {
       try {
         this.loading = true
-        const response = await api.put(`/api/v1/gtu-admin/degree-programs/${id}`, data)
+        const response = await api.put(`/gtu-admin/degree-programs/${id}`, data)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error updating degree program'
@@ -164,7 +164,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async deleteDegreeProgram(id) {
       try {
         this.loading = true
-        const response = await api.delete(`/api/v1/gtu-admin/degree-programs/${id}`)
+        const response = await api.delete(`/gtu-admin/degree-programs/${id}`)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error deleting degree program'
@@ -177,7 +177,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async getProgramSubjects(programId) {
       try {
         this.loading = true
-        const response = await api.get(`/api/v1/gtu-admin/degree-programs/${programId}/subjects`)
+        const response = await api.get(`/gtu-admin/degree-programs/${programId}/subjects`)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error fetching program subjects'
@@ -191,7 +191,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async fetchSubjects() {
       try {
         this.loading = true
-        const response = await api.get('/api/v1/gtu-admin/subjects')
+        const response = await api.get('/gtu-admin/subjects')
         this.subjects = response.data
         return response.data
       } catch (error) {
@@ -205,7 +205,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async createSubject(data) {
       try {
         this.loading = true
-        const response = await api.post('/api/v1/gtu-admin/subjects', data)
+        const response = await api.post('/gtu-admin/subjects', data)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error creating subject'
@@ -218,7 +218,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async updateSubject(id, data) {
       try {
         this.loading = true
-        const response = await api.put(`/api/v1/gtu-admin/subjects/${id}`, data)
+        const response = await api.put(`/gtu-admin/subjects/${id}`, data)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error updating subject'
@@ -231,7 +231,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async deleteSubject(id) {
       try {
         this.loading = true
-        const response = await api.delete(`/api/v1/gtu-admin/subjects/${id}`)
+        const response = await api.delete(`/gtu-admin/subjects/${id}`)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error deleting subject'
@@ -245,7 +245,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async mapSubjectToProgram(data) {
       try {
         this.loading = true
-        const response = await api.post('/api/v1/gtu-admin/program-subjects', data)
+        const response = await api.post('/gtu-admin/program-subjects', data)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error mapping subject to program'
@@ -258,7 +258,7 @@ export const useGTUAdminStore = defineStore('gtuAdmin', {
     async unmapSubjectFromProgram(programId, subjectId) {
       try {
         this.loading = true
-        const response = await api.delete(`/api/v1/gtu-admin/program-subjects/${programId}/${subjectId}`)
+        const response = await api.delete(`/gtu-admin/program-subjects/${programId}/${subjectId}`)
         return response.data
       } catch (error) {
         this.error = error.response?.data?.detail || 'Error removing subject from program'

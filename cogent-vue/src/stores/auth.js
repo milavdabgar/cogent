@@ -55,6 +55,9 @@ export const useAuthStore = defineStore('auth', {
           localStorage.setItem('token', this.token)
           localStorage.setItem('role', this.role)
           
+          // Set the token in the API instance immediately
+          api.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
+          
           // Fetch user profile after successful login
           await this.fetchProfile()
           
@@ -225,9 +228,10 @@ export const useAuthStore = defineStore('auth', {
       this.token = null
       this.role = null
       this.profile = null
-      this.error = null
       localStorage.removeItem('token')
       localStorage.removeItem('role')
+      // Remove the token from the API instance
+      delete api.defaults.headers.common['Authorization']
     }
   }
 })

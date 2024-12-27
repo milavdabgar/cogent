@@ -12,6 +12,12 @@ export const api = axios.create({
   }
 })
 
+// Initialize API with existing token if available
+const token = localStorage.getItem('token')
+if (token) {
+  api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+}
+
 // Add request interceptor to add token
 api.interceptors.request.use(
   (config) => {

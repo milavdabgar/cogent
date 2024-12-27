@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Generator, Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -88,7 +89,7 @@ async def get_current_active_gtu_admin(
 def get_current_admin_user(
     current_user: User = Depends(get_current_active_user),
 ) -> User:
-    if not current_user.is_superuser:
+    if current_user.role != UserRole.GTU_ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="The user doesn't have enough privileges"
