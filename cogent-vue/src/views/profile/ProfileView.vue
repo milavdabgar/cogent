@@ -64,33 +64,14 @@
                       />
                     </v-col>
                     <v-col cols="12" md="6">
-                      <v-menu
-                        v-if="isEditing"
-                        v-model="dateMenu"
-                        :close-on-content-click="false"
-                      >
-                        <template v-slot:activator="{ props }">
-                          <v-text-field
-                            v-model="formattedDateOfBirth"
-                            label="Date of Birth"
-                            readonly
-                            v-bind="props"
-                            variant="outlined"
-                            :class="{ 'editable': isEditing }"
-                            prepend-icon="mdi-calendar"
-                          />
-                        </template>
-                        <v-date-picker
-                          v-model="profileForm.date_of_birth"
-                          @update:model-value="dateMenu = false"
-                        />
-                      </v-menu>
                       <v-text-field
-                        v-else
-                        v-model="formattedDateOfBirth"
+                        v-model="profileForm.date_of_birth"
+                        type="date"
                         label="Date of Birth"
-                        readonly
+                        :readonly="!isEditing"
                         variant="outlined"
+                        :class="{ 'editable': isEditing }"
+                        prepend-icon="mdi-calendar"
                       />
                     </v-col>
 
@@ -131,33 +112,14 @@
                         />
                       </v-col>
                       <v-col cols="12" md="6">
-                        <v-menu
-                          v-if="isEditing"
-                          v-model="dateAdmissionMenu"
-                          :close-on-content-click="false"
-                        >
-                          <template v-slot:activator="{ props }">
-                            <v-text-field
-                              v-model="formattedDateOfAdmission"
-                              label="Date of Admission"
-                              readonly
-                              v-bind="props"
-                              variant="outlined"
-                              :class="{ 'editable': isEditing }"
-                              prepend-icon="mdi-calendar"
-                            />
-                          </template>
-                          <v-date-picker
-                            v-model="profileForm.student_details.date_of_admission"
-                            @update:model-value="dateAdmissionMenu = false"
-                          />
-                        </v-menu>
                         <v-text-field
-                          v-else
-                          v-model="formattedDateOfAdmission"
+                          v-model="profileForm.student_details.date_of_admission"
+                          type="date"
                           label="Date of Admission"
-                          readonly
+                          :readonly="!isEditing"
                           variant="outlined"
+                          :class="{ 'editable': isEditing }"
+                          prepend-icon="mdi-calendar"
                         />
                       </v-col>
                     </template>
@@ -194,33 +156,14 @@
                         />
                       </v-col>
                       <v-col cols="12" md="6">
-                        <v-menu
-                          v-if="isEditing"
-                          v-model="dateJoiningMenu"
-                          :close-on-content-click="false"
-                        >
-                          <template v-slot:activator="{ props }">
-                            <v-text-field
-                              v-model="formattedDateOfJoining"
-                              label="Date of Joining"
-                              readonly
-                              v-bind="props"
-                              variant="outlined"
-                              :class="{ 'editable': isEditing }"
-                              prepend-icon="mdi-calendar"
-                            />
-                          </template>
-                          <v-date-picker
-                            v-model="profileForm.faculty_details.date_of_joining"
-                            @update:model-value="dateJoiningMenu = false"
-                          />
-                        </v-menu>
                         <v-text-field
-                          v-else
-                          v-model="formattedDateOfJoining"
+                          v-model="profileForm.faculty_details.date_of_joining"
+                          type="date"
                           label="Date of Joining"
-                          readonly
+                          :readonly="!isEditing"
                           variant="outlined"
+                          :class="{ 'editable': isEditing }"
+                          prepend-icon="mdi-calendar"
                         />
                       </v-col>
                     </template>
@@ -258,33 +201,14 @@
                         />
                       </v-col>
                       <v-col cols="12" md="6">
-                        <v-menu
-                          v-if="isEditing"
-                          v-model="dateJoiningMenu"
-                          :close-on-content-click="false"
-                        >
-                          <template v-slot:activator="{ props }">
-                            <v-text-field
-                              v-model="formattedDateOfJoining"
-                              label="Date of Joining"
-                              readonly
-                              v-bind="props"
-                              variant="outlined"
-                              :class="{ 'editable': isEditing }"
-                              prepend-icon="mdi-calendar"
-                            />
-                          </template>
-                          <v-date-picker
-                            v-model="profileForm.hod_details.date_of_joining"
-                            @update:model-value="dateJoiningMenu = false"
-                          />
-                        </v-menu>
                         <v-text-field
-                          v-else
-                          v-model="formattedDateOfJoining"
+                          v-model="profileForm.hod_details.date_of_joining"
+                          type="date"
                           label="Date of Joining"
-                          readonly
+                          :readonly="!isEditing"
                           variant="outlined"
+                          :class="{ 'editable': isEditing }"
+                          prepend-icon="mdi-calendar"
                         />
                       </v-col>
                     </template>
@@ -312,33 +236,14 @@
                         />
                       </v-col>
                       <v-col cols="12" md="6">
-                        <v-menu
-                          v-if="isEditing"
-                          v-model="dateJoiningMenu"
-                          :close-on-content-click="false"
-                        >
-                          <template v-slot:activator="{ props }">
-                            <v-text-field
-                              v-model="formattedDateOfJoining"
-                              label="Date of Joining"
-                              readonly
-                              v-bind="props"
-                              variant="outlined"
-                              :class="{ 'editable': isEditing }"
-                              prepend-icon="mdi-calendar"
-                            />
-                          </template>
-                          <v-date-picker
-                            v-model="profileForm.principal_details.date_of_joining"
-                            @update:model-value="dateJoiningMenu = false"
-                          />
-                        </v-menu>
                         <v-text-field
-                          v-else
-                          v-model="formattedDateOfJoining"
+                          v-model="profileForm.principal_details.date_of_joining"
+                          type="date"
                           label="Date of Joining"
-                          readonly
+                          :readonly="!isEditing"
                           variant="outlined"
+                          :class="{ 'editable': isEditing }"
+                          prepend-icon="mdi-calendar"
                         />
                       </v-col>
                     </template>
@@ -365,49 +270,30 @@
                         />
                       </v-col>
                       <v-col cols="12" md="6">
-                        <v-menu
-                          v-if="isEditing"
-                          v-model="dateJoiningMenu"
-                          :close-on-content-click="false"
-                        >
-                          <template v-slot:activator="{ props }">
-                            <v-text-field
-                              v-model="formattedDateOfJoining"
-                              label="Date of Joining"
-                              readonly
-                              v-bind="props"
-                              variant="outlined"
-                              :class="{ 'editable': isEditing }"
-                              prepend-icon="mdi-calendar"
-                            />
-                          </template>
-                          <v-date-picker
-                            v-model="profileForm.lab_assistant_details.date_of_joining"
-                            @update:model-value="dateJoiningMenu = false"
-                          />
-                        </v-menu>
                         <v-text-field
-                          v-else
-                          v-model="formattedDateOfJoining"
+                          v-model="profileForm.lab_assistant_details.date_of_joining"
+                          type="date"
                           label="Date of Joining"
-                          readonly
+                          :readonly="!isEditing"
                           variant="outlined"
+                          :class="{ 'editable': isEditing }"
+                          prepend-icon="mdi-calendar"
                         />
                       </v-col>
                     </template>
-                  </v-row>
 
-                  <v-card-actions v-if="isEditing">
-                    <v-spacer />
-                    <v-btn
-                      color="primary"
-                      type="submit"
-                      :loading="profileStore.loading"
-                      :disabled="!profileForm.valid"
-                    >
-                      Save Changes
-                    </v-btn>
-                  </v-card-actions>
+                    <v-card-actions v-if="isEditing">
+                      <v-spacer />
+                      <v-btn
+                        color="primary"
+                        type="submit"
+                        :loading="profileStore.loading"
+                        :disabled="!profileForm.valid"
+                      >
+                        Save Changes
+                      </v-btn>
+                    </v-card-actions>
+                  </v-row>
                 </v-form>
               </v-window-item>
 
@@ -499,9 +385,6 @@ const passwordFormRef = ref(null)
 const activeTab = ref('profile')
 const snackbar = ref({ show: false, text: '', color: 'success' })
 const isEditing = ref(false)
-const dateMenu = ref(false)
-const dateJoiningMenu = ref(false)
-const dateAdmissionMenu = ref(false)
 
 const profileForm = ref({
   valid: true,
@@ -547,77 +430,59 @@ const passwordForm = ref({
   confirm_password: ''
 })
 
-// Format date for display
-const formattedDateOfBirth = computed(() => formatDate(profileForm.value.date_of_birth))
-const formattedDateOfJoining = computed(() => {
-  const role = profileStore.profile?.role
-  if (!role) return ''
-  
-  let date = ''
-  switch (role) {
-    case 'faculty':
-      date = profileForm.value.faculty_details.date_of_joining
-      break
-    case 'hod':
-      date = profileForm.value.hod_details.date_of_joining
-      break
-    case 'principal':
-      date = profileForm.value.principal_details.date_of_joining
-      break
-    case 'lab_assistant':
-      date = profileForm.value.lab_assistant_details.date_of_joining
-      break
-  }
-  return formatDate(date)
-})
-const formattedDateOfAdmission = computed(() => formatDate(profileForm.value.student_details.date_of_admission))
-
-// Date formatter
+// Format date for display and input
 const formatDate = (date) => {
   if (!date) return ''
-  return new Date(date).toLocaleDateString()
+  try {
+    const d = new Date(date)
+    if (isNaN(d.getTime())) return ''
+    return d.toISOString().split('T')[0] // Returns YYYY-MM-DD format
+  } catch (e) {
+    console.error('Error formatting date:', e)
+    return ''
+  }
 }
 
 onMounted(async () => {
   try {
     await profileStore.fetchProfile()
     if (profileStore.profile) {
-      // Set basic fields
       const { first_name, last_name, email, phone_number, date_of_birth } = profileStore.profile
+      
       profileForm.value.first_name = first_name
       profileForm.value.last_name = last_name
       profileForm.value.email = email
       profileForm.value.phone_number = phone_number
-      profileForm.value.date_of_birth = date_of_birth
+      profileForm.value.date_of_birth = formatDate(date_of_birth)
 
       // Set role-specific fields
       if (profileStore.profile.role === 'student' && profileStore.profile.student_details) {
         const { enrollment_number, department, date_of_admission, current_semester } = profileStore.profile.student_details
         profileForm.value.student_details.enrollment_number = enrollment_number
         profileForm.value.student_details.department = department
-        profileForm.value.student_details.date_of_admission = date_of_admission
+        profileForm.value.student_details.date_of_admission = formatDate(date_of_admission)
         profileForm.value.student_details.current_semester = current_semester
       } else if (profileStore.profile.role === 'faculty' && profileStore.profile.faculty_details) {
         const { department, date_of_joining, qualification, specialization } = profileStore.profile.faculty_details
         profileForm.value.faculty_details.department = department
-        profileForm.value.faculty_details.date_of_joining = date_of_joining
+        profileForm.value.faculty_details.date_of_joining = formatDate(date_of_joining)
         profileForm.value.faculty_details.qualification = qualification
         profileForm.value.faculty_details.specialization = specialization
       } else if (profileStore.profile.role === 'hod' && profileStore.profile.hod_details) {
         const { department, date_of_joining, qualification, experience_years } = profileStore.profile.hod_details
         profileForm.value.hod_details.department = department
-        profileForm.value.hod_details.date_of_joining = date_of_joining
+        profileForm.value.hod_details.date_of_joining = formatDate(date_of_joining)
         profileForm.value.hod_details.qualification = qualification
         profileForm.value.hod_details.experience_years = experience_years
       } else if (profileStore.profile.role === 'principal' && profileStore.profile.principal_details) {
         const { date_of_joining, qualification, experience_years } = profileStore.profile.principal_details
-        profileForm.value.principal_details.date_of_joining = date_of_joining
+        profileForm.value.principal_details.date_of_joining = formatDate(date_of_joining)
         profileForm.value.principal_details.qualification = qualification
         profileForm.value.principal_details.experience_years = experience_years
       } else if (profileStore.profile.role === 'lab_assistant' && profileStore.profile.lab_assistant_details) {
         const { department, date_of_joining, lab_type } = profileStore.profile.lab_assistant_details
         profileForm.value.lab_assistant_details.department = department
-        profileForm.value.lab_assistant_details.date_of_joining = date_of_joining
+        profileForm.value.lab_assistant_details.date_of_joining = formatDate(date_of_joining)
         profileForm.value.lab_assistant_details.lab_type = lab_type
       }
     }
@@ -633,40 +498,41 @@ const toggleEditMode = () => {
     if (profileStore.profile) {
       // Reset basic fields
       const { first_name, last_name, email, phone_number, date_of_birth } = profileStore.profile
+      
       profileForm.value.first_name = first_name
       profileForm.value.last_name = last_name
       profileForm.value.email = email
       profileForm.value.phone_number = phone_number
-      profileForm.value.date_of_birth = date_of_birth
+      profileForm.value.date_of_birth = formatDate(date_of_birth)
 
       // Reset role-specific fields
       if (profileStore.profile.role === 'student' && profileStore.profile.student_details) {
         const { enrollment_number, department, date_of_admission, current_semester } = profileStore.profile.student_details
         profileForm.value.student_details.enrollment_number = enrollment_number
         profileForm.value.student_details.department = department
-        profileForm.value.student_details.date_of_admission = date_of_admission
+        profileForm.value.student_details.date_of_admission = formatDate(date_of_admission)
         profileForm.value.student_details.current_semester = current_semester
       } else if (profileStore.profile.role === 'faculty' && profileStore.profile.faculty_details) {
         const { department, date_of_joining, qualification, specialization } = profileStore.profile.faculty_details
         profileForm.value.faculty_details.department = department
-        profileForm.value.faculty_details.date_of_joining = date_of_joining
+        profileForm.value.faculty_details.date_of_joining = formatDate(date_of_joining)
         profileForm.value.faculty_details.qualification = qualification
         profileForm.value.faculty_details.specialization = specialization
       } else if (profileStore.profile.role === 'hod' && profileStore.profile.hod_details) {
         const { department, date_of_joining, qualification, experience_years } = profileStore.profile.hod_details
         profileForm.value.hod_details.department = department
-        profileForm.value.hod_details.date_of_joining = date_of_joining
+        profileForm.value.hod_details.date_of_joining = formatDate(date_of_joining)
         profileForm.value.hod_details.qualification = qualification
         profileForm.value.hod_details.experience_years = experience_years
       } else if (profileStore.profile.role === 'principal' && profileStore.profile.principal_details) {
         const { date_of_joining, qualification, experience_years } = profileStore.profile.principal_details
-        profileForm.value.principal_details.date_of_joining = date_of_joining
+        profileForm.value.principal_details.date_of_joining = formatDate(date_of_joining)
         profileForm.value.principal_details.qualification = qualification
         profileForm.value.principal_details.experience_years = experience_years
       } else if (profileStore.profile.role === 'lab_assistant' && profileStore.profile.lab_assistant_details) {
         const { department, date_of_joining, lab_type } = profileStore.profile.lab_assistant_details
         profileForm.value.lab_assistant_details.department = department
-        profileForm.value.lab_assistant_details.date_of_joining = date_of_joining
+        profileForm.value.lab_assistant_details.date_of_joining = formatDate(date_of_joining)
         profileForm.value.lab_assistant_details.lab_type = lab_type
       }
     }
