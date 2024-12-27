@@ -110,7 +110,17 @@ class UserCreate(UserBase):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
-    role: UserRole
+    role: Optional[str] = None
+
+    @validator('role')
+    def validate_role(cls, v):
+        if v:
+            try:
+                role_key = v.replace(' ', '_').upper()
+                return UserRole[role_key]
+            except KeyError:
+                raise ValueError('Invalid role')
+        return None
 
 class Token(BaseModel):
     access_token: str

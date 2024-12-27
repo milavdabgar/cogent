@@ -1,12 +1,12 @@
 from datetime import timedelta
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, status, Form
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.core import security
 from app.core.config import settings
 from app.db.session import get_db
-from app.crud.crud_user import user
+from app.crud.crud_user import user as user_crud
 from app.schemas.user import Token, UserCreate, UserResponse, UserLogin
 from app.schemas.profile import (
     ProfileUpdate,
@@ -26,20 +26,19 @@ def signup(*, db: Session = Depends(get_db), user_in: UserCreate) -> Any:
     """
     Create new user with role-specific details.
     """
-    user = user.create(db, user_in)
-    return user
+    new_user = user_crud.create(db, user_in)
+    return new_user
 
 @router.post("/login", response_model=Token)
 async def login(
+    *,
     db: Session = Depends(get_db),
-    email: str = Form(...),
-    password: str = Form(...),
-    role: str = Form(None)
+    login_data: UserLogin
 ) -> Any:
     """
     OAuth2 compatible token login, get an access token for future requests.
     """
-    authenticated_user = user.authenticate(db, email, password)
+    authenticated_user = user_crud.authenticate(db, login_data.email, login_data.password)
     if not authenticated_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -48,7 +47,7 @@ async def login(
         )
     
     # Verify role if provided
-    if role and authenticated_user.role != role:
+    if login_data.role and authenticated_user.role != login_data.role:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect role for this user",
@@ -182,7 +181,7 @@ async def reset_password(
     db: Session = Depends(deps.get_db)
 ) -> Any:
     """Request password reset."""
-    user_obj = user.get_by_email(db, email=password_reset.email)
+    user_obj = user_crud.get_by_email(db, email=password_reset.email)
     if user_obj:
         # TODO: Send password reset email
         pass

@@ -6,7 +6,12 @@ const API_URL = 'http://localhost:8000/api/v1'
 
 // Create axios instance with base URL and interceptors
 const api = axios.create({
-  baseURL: API_URL
+  baseURL: API_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
 })
 
 // Add request interceptor to add token
@@ -77,19 +82,7 @@ export const useAuthStore = defineStore('auth', {
         this.loading = true
         this.error = null
         
-        // Create FormData object
-        const formData = new FormData()
-        formData.append('email', credentials.email)
-        formData.append('password', credentials.password)
-        if (credentials.role) {
-          formData.append('role', credentials.role)
-        }
-        
-        const response = await api.post('/auth/login', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        })
+        const response = await api.post('/auth/login', credentials)
         
         if (response.data && response.data.access_token) {
           this.token = response.data.access_token
