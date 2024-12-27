@@ -38,7 +38,7 @@ async def login(
     """
     OAuth2 compatible token login, get an access token for future requests.
     """
-    authenticated_user = user_crud.authenticate(db, login_data.email, login_data.password)
+    authenticated_user = user_crud.authenticate(db=db, email=login_data.email, password=login_data.password)
     if not authenticated_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

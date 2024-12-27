@@ -18,7 +18,7 @@ async def get_colleges(
     db: Session = Depends(deps.get_db),
 ):
     """Get all colleges"""
-    colleges = college_crud.get_colleges(
+    colleges = college_crud.get_multi(
         db, skip=skip, limit=limit, search=search
     )
     return colleges

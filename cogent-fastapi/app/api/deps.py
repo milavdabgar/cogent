@@ -38,7 +38,7 @@ def get_current_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    current_user = user.get_by_email(db, email=token_data.email)
+    current_user = db.query(User).filter(User.id == token_data.sub).first()
     if not current_user:
         raise HTTPException(status_code=404, detail="User not found")
     if not current_user.is_active:
